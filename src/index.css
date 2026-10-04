@@ -84,3 +84,7 @@
         @apply h-8.75 w-29.75 px-2.5 py-5.5;
     }
 }
+
+body {
+    font-family: var(--font-archivo);
+}
