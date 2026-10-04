@@ -1,0 +1,5 @@
+npm run ts-check
+npm run lint:oxlint
+npm run lint:eslint
+npm run prettier
+
