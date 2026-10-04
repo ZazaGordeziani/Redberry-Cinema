@@ -5,15 +5,14 @@ import MainPage from '@/pages/main-page';
 
 function App() {
     return (
-        <>
-            <BrowserRouter>
-                <Routes>
-                    <Route element={<DefaultLayout />}>
-                        <Route path="/" element={<MainPage />} />
-                    </Route>
-                </Routes>
-            </BrowserRouter>
-        </>
+        <BrowserRouter>
+            <Routes>
+                <Route element={<DefaultLayout />}>
+                    <Route path="/" element={<MainPage />} />
+                    <Route path="/login" element={<MainPage />} />
+                </Route>
+            </Routes>
+        </BrowserRouter>
     );
 }
 
