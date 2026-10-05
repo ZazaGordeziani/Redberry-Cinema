@@ -50,6 +50,9 @@ export const Login = () => {
 
     const { mutate: handleLogin } = useLogin({
         onSuccess: (data: LoginResponse) => {
+            console.log('Login response:', data);
+            console.log('Access token:', data.token);
+
             if (data.token) localStorage.setItem('token', data.token);
             if (data.user?.username)
                 localStorage.setItem('username', data.user.username);
@@ -96,12 +99,14 @@ export const Login = () => {
             onClick={handleClose}
         >
             <section
-                className="bg-background flex w-100.75 flex-col gap-6 rounded-[28px] p-8"
+                className="bg-background border-background-tertiary flex w-100.75 flex-col gap-6 rounded-[28px] border p-8"
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="flex items-start justify-between">
                     <div className="flex flex-col gap-2">
-                        <h2 className="text-h2 text-white">Log in</h2>
+                        <h2 className="text-h2 font-extrabold text-white">
+                            Log in
+                        </h2>
                         <p className="text-light-grey-muted text-body-s font-regular">
                             Welcome back to Kino XII
                         </p>
@@ -240,7 +245,7 @@ export const Login = () => {
                                     Don&apos;t have an account?
                                 </p>
 
-                                <Link to={`/auth/register`}>
+                                <Link to={`/register`}>
                                     <button>
                                         <span className="text-helper-red text-label-m font-extrabold">
                                             Sign up

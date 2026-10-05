@@ -10,6 +10,7 @@ function App() {
                 <Route element={<DefaultLayout />}>
                     <Route path="/" element={<MainPage />} />
                     <Route path="/login" element={<MainPage />} />
+                    <Route path="/register" element={<MainPage />} />
                 </Route>
             </Routes>
         </BrowserRouter>
