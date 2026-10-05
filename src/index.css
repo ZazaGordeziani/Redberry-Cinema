@@ -1,6 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap');
 @import 'tailwindcss';
 
+.input-default:-webkit-autofill,
+.input-default:-webkit-autofill:hover,
+.input-default:-webkit-autofill:focus,
+.input-default:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--color-white) !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--color-background-secondary) inset !important;
+    caret-color: var(--color-white);
+}
+
+.input-default.input-error:-webkit-autofill,
+.input-default.input-error:-webkit-autofill:hover,
+.input-default.input-error:-webkit-autofill:focus,
+.input-default.input-error:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--color-helper-red) !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--color-background-secondary) inset !important;
+    caret-color: var(--color-helper-red);
+}
 @theme {
     /* Font family */
     --font-archivo: 'Archivo', sans-serif;
@@ -82,6 +99,9 @@
 
     .button-primary-card {
         @apply h-8.75 w-29.75 px-2.5 py-5.5;
+    }
+    .input-default {
+        @apply bg-background-secondary text-label-s flex h-10 w-full justify-between rounded-xl px-4 text-white;
     }
 }
 

@@ -1,9 +1,9 @@
-import axios from 'axios'
+import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_BASE_URL
+const baseURL = import.meta.env.VITE_BASE_URL;
 
 if (!baseURL) {
-    throw new Error('VITE_BASE_URL is not defined in .env')
+    throw new Error('VITE_BASE_URL is not defined in .env');
 }
 
 export const httpClient = axios.create({
@@ -12,13 +12,13 @@ export const httpClient = axios.create({
         'Content-Type': 'application/json',
         Accept: 'application/json',
     },
-})
+});
 
 httpClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token');
 
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`
+        config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
-})
+    return config;
+});

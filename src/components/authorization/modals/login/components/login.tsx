@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate, type Location } from 'react-router';
 
@@ -8,14 +7,14 @@ import { httpClient } from '@/api';
 import { userAtom } from '@/store/auth';
 import { useAtom } from 'jotai';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye } from '@/components/authorization/modals/assets/eye';
-import { SlashEye } from '@/components/authorization/modals/assets/slash-eye';
+
 import { LoginFormSchema } from '@/components/authorization/modals/login/components/schema';
 import type { LoginFormValues } from '@/components/authorization/modals/login/components/index.types';
 import CloseSign from '@/assets/close-sign';
+import CheckMark from '@/assets/check-mark';
+import ExclamationMark from '@/assets/exclamation-mark';
 
 export const Login = () => {
-    const [showPassword, setShowPassword] = useState<boolean>(false);
     const [, setUser] = useAtom(userAtom);
 
     type LocationState = {
@@ -37,9 +36,12 @@ export const Login = () => {
 
     const {
         control,
-
         handleSubmit,
         setError,
+        reset,
+        trigger,
+        clearErrors,
+        formState: { isValid },
     } = useForm<LoginFormValues>({
         resolver: zodResolver(LoginFormSchema),
         defaultValues: LoginFormDefaultValues,
@@ -83,23 +85,28 @@ export const Login = () => {
     if (location.pathname !== '/login') {
         return null;
     }
+
+    const handleClose = () => {
+        reset();
+        navigate('/');
+    };
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-            onClick={() => navigate('/')}
+            onClick={handleClose}
         >
             <section
-                className="bg-background flex h-100 w-100.75 flex-col gap-6 rounded-[28px] p-8"
+                className="bg-background flex w-100.75 flex-col gap-6 rounded-[28px] p-8"
                 onClick={(event) => event.stopPropagation()}
             >
-                <div className="flex justify-between">
+                <div className="flex items-start justify-between">
                     <div className="flex flex-col gap-2">
                         <h2 className="text-h2 text-white">Log in</h2>
                         <p className="text-light-grey-muted text-body-s font-regular">
                             Welcome back to Kino XII
                         </p>
                     </div>
-                    <button type="submit" onClick={() => navigate('/')}>
+                    <button type="submit" onClick={handleClose}>
                         <CloseSign className="h-6 w-6 cursor-pointer" />
                     </button>
                 </div>
@@ -109,23 +116,52 @@ export const Login = () => {
                             name="email"
                             control={control}
                             render={({
-                                field: { onChange, value },
-                                fieldState: { error },
+                                field: { onChange, value, onBlur },
+                                fieldState: { error, isTouched },
                             }) => {
                                 const hasError = !!error;
+                                const isValid =
+                                    isTouched && !error && value.length > 0;
+
                                 return (
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col gap-2">
+                                        <label
+                                            htmlFor="email"
+                                            className={`text-label-s font-semibold ${
+                                                hasError
+                                                    ? 'text-helper-red'
+                                                    : 'text-white'
+                                            }`}
+                                        >
+                                            Email
+                                        </label>
+
                                         <div className="relative">
                                             <input
                                                 onChange={onChange}
+                                                onBlur={() => {
+                                                    if (
+                                                        error?.type === 'server'
+                                                    ) {
+                                                        clearErrors('email');
+                                                    }
+
+                                                    onBlur();
+                                                }}
                                                 value={value}
-                                                className={`input-default ${hasError ? 'border-orange-600' : ''}`}
-                                                placeholder="E-mail"
-                                            />
+                                                className={`input-default outline-none ${hasError ? 'border-helper-red input-error text-helper-red placeholder:text-helper-red placeholder:text-label-s border' : 'placeholder:text-label-s placeholder:text-light-grey-muted placeholder:font-semibold'}`}
+                                                placeholder="example@gmail.com"
+                                            />{' '}
+                                            {isValid && (
+                                                <CheckMark className="text-helper-green absolute top-1/2 right-4 -translate-y-1/2" />
+                                            )}
+                                            {hasError && (
+                                                <ExclamationMark className="absolute top-1/2 right-4 -translate-y-1/2" />
+                                            )}
                                         </div>
                                         {error?.type !== 'server' &&
                                             error?.message && (
-                                                <span className="mt-3 block text-red-500">
+                                                <span className="text-helper-red text-label-s font-semibold">
                                                     {error.message}
                                                 </span>
                                             )}
@@ -138,45 +174,45 @@ export const Login = () => {
                             name="password"
                             control={control}
                             render={({
-                                field: { onChange, value },
-                                fieldState: { error },
+                                field: { onChange, value, onBlur },
+                                fieldState: { error, invalid },
                             }) => {
-                                const hasServerError = error?.type === 'server';
+                                const hasError = !!error;
+                                const isValid = !invalid && value.length >= 3;
 
                                 return (
                                     <>
-                                        <div className="flex flex-col">
+                                        <div className="flex flex-col gap-2">
+                                            <label
+                                                htmlFor="password"
+                                                className={`text-label-s font-semibold ${
+                                                    hasError
+                                                        ? 'text-helper-red'
+                                                        : 'text-white'
+                                                }`}
+                                            >
+                                                Password
+                                            </label>
                                             <div className="relative">
                                                 <input
                                                     value={value}
-                                                    onChange={onChange}
-                                                    className={`input-default ${hasServerError ? 'border-orange-600' : ''}`}
-                                                    placeholder="Password"
-                                                    type={
-                                                        showPassword
-                                                            ? 'text'
-                                                            : 'password'
-                                                    }
+                                                    onBlur={onBlur}
+                                                    onChange={(event) => {
+                                                        onChange(event);
+                                                        trigger('password');
+                                                    }}
+                                                    className={`input-default outline-none ${hasError ? 'border-helper-red placeholder:text-helper-red text-helper-red border' : ''}`}
+                                                    placeholder="••••••••"
                                                 />
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setShowPassword(
-                                                            !showPassword,
-                                                        )
-                                                    }
-                                                    className="absolute top-1/2 right-3 -translate-y-1/2 transform text-black"
-                                                >
-                                                    {showPassword ? (
-                                                        <Eye />
-                                                    ) : (
-                                                        <SlashEye />
-                                                    )}
-                                                </button>
+                                                {isValid && (
+                                                    <CheckMark className="text-helper-green absolute top-1/2 right-4 -translate-y-1/2" />
+                                                )}
+                                                {hasError && (
+                                                    <ExclamationMark className="absolute top-1/2 right-4 -translate-y-1/2" />
+                                                )}
                                             </div>
                                             {error?.message && (
-                                                <span className="mt-3 block text-red-500">
+                                                <span className="text-helper-red text-label-s font-semibold">
                                                     {error.message}
                                                 </span>
                                             )}
@@ -186,19 +222,28 @@ export const Login = () => {
                             }}
                         />
 
-                        <div className="mt-5 flex flex-col justify-center gap-6">
-                            <button className="font-poppins flex h-[41px] items-center justify-center rounded-[10px] bg-orange-600 text-[14px] leading-[100%] font-normal text-white">
+                        <div className="mt-2 flex flex-col justify-center gap-6">
+                            <button
+                                type="submit"
+                                onClick={() => console.log('clicked on button')}
+                                disabled={!isValid}
+                                className={`text-label-m flex h-10.25 items-center justify-center rounded-[999px] font-extrabold ${
+                                    isValid
+                                        ? 'bg-helper-red cursor-pointer text-white'
+                                        : 'bg-dark-grey text-light-grey-muted'
+                                }`}
+                            >
                                 Log in
                             </button>
                             <div className="flex items-center justify-center gap-2">
-                                <p className="font-poppins text-sm leading-[100%] font-normal tracking-[0px] text-zinc-700">
-                                    Not a member?
+                                <p className="text-body-m font-regular text-light-grey-muted">
+                                    Don&apos;t have an account?
                                 </p>
 
                                 <Link to={`/auth/register`}>
                                     <button>
-                                        <span className="font-poppins text-sm leading-[100%] font-medium tracking-[0px] text-orange-600">
-                                            Register
+                                        <span className="text-helper-red text-label-m font-extrabold">
+                                            Sign up
                                         </span>
                                     </button>
                                 </Link>
