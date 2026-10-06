@@ -5,4 +5,6 @@ export type User = {
     email?: string;
     token?: string;
 } | null;
-export const userAtom = atomWithStorage<User>('user', null);
+export const userAtom = atomWithStorage<User>('user', null, undefined, {
+    getOnInit: true,
+});

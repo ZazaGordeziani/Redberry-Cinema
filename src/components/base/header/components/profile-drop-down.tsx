@@ -116,9 +116,11 @@ const ProfileDropDown = ({ me }: ProfileDropDownProps) => {
                 )}
             </div>
 
-            {/* Links */}
             <div className="mt-5 flex flex-col gap-5">
-                <div className="flex items-center gap-2">
+                <div
+                    className="flex cursor-pointer items-center gap-2"
+                    onClick={() => navigate('/profile')}
+                >
                     <ProfileIcon />
                     <p className="text-label-m cursor-pointer font-semibold text-white">
                         My profile

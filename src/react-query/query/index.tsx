@@ -1,4 +1,5 @@
 import { getMe } from '@/api/auth';
+import { getFilterOptions } from '@/api/venues';
 import { userAtom } from '@/store/auth';
 import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
@@ -9,5 +10,11 @@ export const useMe = () => {
         queryKey: ['me'],
         queryFn: getMe,
         enabled: !!user?.token,
+    });
+};
+export const useVenues = () => {
+    return useQuery({
+        queryKey: ['filter-options', 'venues'],
+        queryFn: getFilterOptions,
     });
 };

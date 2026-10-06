@@ -1,5 +1,10 @@
-import { login, logout, register } from '@/api/auth';
-import type { LoginResponse, RegisterResponse } from '@/api/auth/index.types';
+import { login, logout, register, updateProfile } from '@/api/auth';
+import type {
+    LoginResponse,
+    MeResponse,
+    RegisterResponse,
+    UpdateProfilePayload,
+} from '@/api/auth/index.types';
 import type { LoginFormValues } from '@/components/authorization/modals/login/components/index.types';
 import type { RegisterFormValues } from '@/components/authorization/modals/register/components/index.types';
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
@@ -35,6 +40,15 @@ export const useLogout = (
 ) => {
     return useMutation<void, AxiosError, void>({
         mutationFn: logout,
+        ...options,
+    });
+};
+
+export const useUpdateProfile = (
+    options?: UseMutationOptions<MeResponse, AxiosError, UpdateProfilePayload>,
+) => {
+    return useMutation({
+        mutationFn: updateProfile,
         ...options,
     });
 };

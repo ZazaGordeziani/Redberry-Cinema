@@ -52,3 +52,10 @@ export type MeResponse = {
     } | null;
     profileComplete: boolean;
 };
+export type UpdateProfilePayload = {
+    fullName: string;
+    mobileNumber: string;
+    dateOfBirth: string;
+    preferredVenueId?: number | null;
+    avatar?: File | null;
+};

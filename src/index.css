@@ -107,4 +107,5 @@
 
 body {
     font-family: var(--font-archivo);
+    background-color: var(--color-background);
 }

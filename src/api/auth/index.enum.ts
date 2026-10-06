@@ -3,4 +3,5 @@ export const AUTH_ENDPONTS = {
     REGISTER: '/register',
     ME: '/me',
     LOGOUT: '/logout',
+    PROFILE: '/profile',
 } as const;

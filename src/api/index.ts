@@ -14,9 +14,23 @@ export const httpClient = axios.create({
     },
 });
 
-httpClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+const getToken = () => {
+    const direct = localStorage.getItem('token');
+    if (direct) return direct;
 
+    const raw = localStorage.getItem('user');
+    if (!raw) return null;
+
+    try {
+        const parsed = JSON.parse(raw) as { token?: string } | null;
+        return parsed?.token ?? null;
+    } catch {
+        return null;
+    }
+};
+
+httpClient.interceptors.request.use((config) => {
+    const token = getToken();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
