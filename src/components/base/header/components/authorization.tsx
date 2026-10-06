@@ -1,8 +1,13 @@
 import { useNavigate } from 'react-router';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/store/auth';
 
 const Authorization = () => {
     const navigate = useNavigate();
-
+    const [user] = useAtom(userAtom);
+    if (user?.token) {
+        return null;
+    }
     return (
         <div className="text-body-m flex gap-3 leading-[100%] font-extrabold tracking-normal">
             <button
