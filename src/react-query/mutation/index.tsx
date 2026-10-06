@@ -1,4 +1,4 @@
-import { login, register } from '@/api/auth';
+import { login, logout, register } from '@/api/auth';
 import type { LoginResponse, RegisterResponse } from '@/api/auth/index.types';
 import type { LoginFormValues } from '@/components/authorization/modals/login/components/index.types';
 import type { RegisterFormValues } from '@/components/authorization/modals/register/components/index.types';
@@ -27,6 +27,14 @@ export const useRegister = (
                 ...formData,
                 avatar: formData.avatar ?? null,
             }),
+        ...options,
+    });
+};
+export const useLogout = (
+    options?: UseMutationOptions<void, AxiosError, void>,
+) => {
+    return useMutation<void, AxiosError, void>({
+        mutationFn: logout,
         ...options,
     });
 };

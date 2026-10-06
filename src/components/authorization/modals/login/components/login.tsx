@@ -200,6 +200,7 @@ export const Login = () => {
                                             </label>
                                             <div className="relative">
                                                 <input
+                                                    type="password"
                                                     value={value}
                                                     onBlur={onBlur}
                                                     onChange={(event) => {

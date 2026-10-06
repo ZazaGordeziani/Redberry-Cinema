@@ -1,0 +1,15 @@
+const ProfileIncomplete = () => {
+    return (
+        <svg
+            width="10"
+            height="10"
+            viewBox="0 0 10 10"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <circle cx="5" cy="5" r="4.5" fill="#E27E04" stroke="#070C1C" />
+        </svg>
+    );
+};
+
+export default ProfileIncomplete;

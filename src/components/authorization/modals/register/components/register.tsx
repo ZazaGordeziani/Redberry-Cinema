@@ -343,15 +343,11 @@ export const Register = () => {
                                     control={control}
                                     render={({
                                         field: { onChange, value, onBlur },
-                                        fieldState: {
-                                            error,
-                                            isTouched,
-                                            invalid,
-                                        },
+                                        fieldState: { error, isDirty, invalid },
                                     }) => {
                                         const hasError = !!error;
                                         const isFieldValid =
-                                            isTouched && !invalid;
+                                            isDirty && !invalid;
 
                                         return (
                                             <>
@@ -369,10 +365,13 @@ export const Register = () => {
                                                     </label>
                                                     <div className="relative">
                                                         <input
+                                                            type="password"
                                                             value={value}
-                                                            onChange={onChange}
-                                                            onBlur={() => {
-                                                                onBlur();
+                                                            onBlur={onBlur}
+                                                            onChange={(
+                                                                event,
+                                                            ) => {
+                                                                onChange(event);
                                                                 trigger([
                                                                     'password',
                                                                     'confirmPassword',
@@ -406,15 +405,11 @@ export const Register = () => {
                                     control={control}
                                     render={({
                                         field: { onChange, value, onBlur },
-                                        fieldState: {
-                                            error,
-                                            isTouched,
-                                            invalid,
-                                        },
+                                        fieldState: { error, isDirty, invalid },
                                     }) => {
                                         const hasError = !!error;
                                         const isFieldValid =
-                                            isTouched && !invalid;
+                                            isDirty && !invalid;
 
                                         return (
                                             <>
@@ -431,10 +426,13 @@ export const Register = () => {
                                                     </label>
                                                     <div className="relative">
                                                         <input
+                                                            type="password"
                                                             value={value}
-                                                            onChange={onChange}
-                                                            onBlur={() => {
-                                                                onBlur();
+                                                            onBlur={onBlur}
+                                                            onChange={(
+                                                                event,
+                                                            ) => {
+                                                                onChange(event);
                                                                 trigger([
                                                                     'password',
                                                                     'confirmPassword',

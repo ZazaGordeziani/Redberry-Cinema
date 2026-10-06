@@ -29,3 +29,26 @@ export type RegisterResponse = {
     };
     token: string;
 };
+export type MeResponse = {
+    id: number;
+    username: string;
+    email: string;
+    avatar: string | null;
+    fullName: string | null;
+    mobileNumber: string | null;
+    dateOfBirth: string | null;
+    age: number;
+    preferredVenue: {
+        id: number;
+        slug: string;
+        name: string;
+        city: string;
+        formats: {
+            id: number;
+            slug: string;
+            name: string;
+            priceUplift: number;
+        }[];
+    } | null;
+    profileComplete: boolean;
+};

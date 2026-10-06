@@ -1,7 +1,12 @@
 import Authorization from '@/components/base/header/components/authorization';
 import SearchBar from '@/components/base/header/components/search-bar';
+import UserProfile from '@/components/base/header/components/user-profile';
+import { userAtom } from '@/store/auth';
+import { useAtomValue } from 'jotai';
 
 const Header = () => {
+    const user = useAtomValue(userAtom);
+
     return (
         <header className="h-27.75 w-full bg-[linear-gradient(to_bottom,#000000_0%,#000000_51%,transparent_100%)] px-15 pt-7.5 pb-10">
             <div className="flex justify-between">
@@ -15,7 +20,7 @@ const Header = () => {
                 </div>
                 <div className="flex gap-8">
                     <SearchBar />
-                    <Authorization />
+                    {user?.token ? <UserProfile /> : <Authorization />}
                 </div>
             </div>
         </header>
