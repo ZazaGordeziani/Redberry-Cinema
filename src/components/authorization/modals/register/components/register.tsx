@@ -342,10 +342,17 @@ export const Register = () => {
                                     name="password"
                                     control={control}
                                     render={({
-                                        field: { onChange, value },
-                                        fieldState: { error },
+                                        field: { onChange, value, onBlur },
+                                        fieldState: {
+                                            error,
+                                            isTouched,
+                                            invalid,
+                                        },
                                     }) => {
                                         const hasError = !!error;
+                                        const isFieldValid =
+                                            isTouched && !invalid;
+
                                         return (
                                             <>
                                                 {' '}
@@ -365,6 +372,7 @@ export const Register = () => {
                                                             value={value}
                                                             onChange={onChange}
                                                             onBlur={() => {
+                                                                onBlur();
                                                                 trigger([
                                                                     'password',
                                                                     'confirmPassword',
@@ -373,22 +381,19 @@ export const Register = () => {
                                                             className={`input-default outline-none ${hasError ? 'border-helper-red text-helper-red border' : ''}`}
                                                             placeholder="Password"
                                                         />
-                                                        {isValid && (
+                                                        {isFieldValid && (
                                                             <CheckMark className="text-helper-green absolute top-1/2 right-4 -translate-y-1/2" />
                                                         )}
                                                         {hasError && (
                                                             <ExclamationMark className="absolute top-1/2 right-4 -translate-y-1/2" />
                                                         )}
-
-                                                        <div className="mt-1">
-                                                            {error?.message ? (
-                                                                <span className="text-label-s text-helper-red font-semibold">
-                                                                    {
-                                                                        error.message
-                                                                    }
-                                                                </span>
-                                                            ) : null}
-                                                        </div>
+                                                    </div>
+                                                    <div className="mt-1">
+                                                        {error?.message ? (
+                                                            <span className="text-label-s text-helper-red font-semibold">
+                                                                {error.message}
+                                                            </span>
+                                                        ) : null}
                                                     </div>
                                                 </div>
                                             </>
@@ -400,10 +405,17 @@ export const Register = () => {
                                     name="confirmPassword"
                                     control={control}
                                     render={({
-                                        field: { onChange, value },
-                                        fieldState: { error },
+                                        field: { onChange, value, onBlur },
+                                        fieldState: {
+                                            error,
+                                            isTouched,
+                                            invalid,
+                                        },
                                     }) => {
                                         const hasError = !!error;
+                                        const isFieldValid =
+                                            isTouched && !invalid;
+
                                         return (
                                             <>
                                                 <div className="flex w-full flex-col gap-2">
@@ -415,13 +427,14 @@ export const Register = () => {
                                                                 : 'text-white'
                                                         }`}
                                                     >
-                                                        Confirm assword
+                                                        Confirm password
                                                     </label>
                                                     <div className="relative">
                                                         <input
                                                             value={value}
                                                             onChange={onChange}
                                                             onBlur={() => {
+                                                                onBlur();
                                                                 trigger([
                                                                     'password',
                                                                     'confirmPassword',
@@ -430,7 +443,7 @@ export const Register = () => {
                                                             className={`input-default outline-none ${hasError ? 'border-helper-red text-helper-red border' : ''}`}
                                                             placeholder="Confirm password"
                                                         />
-                                                        {isValid && (
+                                                        {isFieldValid && (
                                                             <CheckMark className="text-helper-green absolute top-1/2 right-4 -translate-y-1/2" />
                                                         )}
                                                         {hasError && (
@@ -442,16 +455,14 @@ export const Register = () => {
 
                                                             className="absolute top-5 right-3 -translate-y-1/2 transform text-black"
                                                         ></button>
-                                                        {error?.message ? (
-                                                            <div className="mt-3">
-                                                                <span className="text-label-s text-helper-red font-semibold">
-                                                                    {
-                                                                        error.message
-                                                                    }
-                                                                </span>
-                                                            </div>
-                                                        ) : null}
                                                     </div>
+                                                    {error?.message ? (
+                                                        <div className="mt-3">
+                                                            <span className="text-label-s text-helper-red font-semibold">
+                                                                {error.message}
+                                                            </span>
+                                                        </div>
+                                                    ) : null}
                                                 </div>
                                             </>
                                         );
