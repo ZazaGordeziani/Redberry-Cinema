@@ -8,11 +8,13 @@ import { Link, useLocation } from 'react-router-dom';
 const Header = () => {
     const user = useAtomValue(userAtom);
     const { pathname } = useLocation();
-    const isMainPage = pathname === '/';
+    const isHeroLayout =
+        pathname === '/' || pathname === '/login' || pathname === '/register';
+
     return (
         <header
             className={`z-50 h-27.75 w-full px-15 pt-7.5 pb-10 ${
-                isMainPage
+                isHeroLayout
                     ? 'absolute top-0 right-0 left-0 bg-transparent'
                     : 'relative bg-[linear-gradient(to_bottom,#000000_0%,#000000_51%,transparent_100%)]'
             }`}

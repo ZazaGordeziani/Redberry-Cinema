@@ -120,3 +120,10 @@ body {
 .hero-progress-fill {
     animation: hero-progress 3s linear forwards;
 }
+.now-playing-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.now-playing-scroll::-webkit-scrollbar {
+    display: none;
+}

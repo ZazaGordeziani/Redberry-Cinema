@@ -3,17 +3,30 @@ import RightArrow from '@/assets/right-arrow';
 import RuntimeIcon from '@/assets/runtime-icon';
 import TicketIcon from '@/assets/ticket-icon';
 import { useFeaturedMovies } from '@/react-query/query';
+import { userAtom } from '@/store/auth';
+import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
     const { data: movies = [], isLoading } = useFeaturedMovies();
     const [activeIndex, setActiveIndex] = useState(0);
     const movie = movies[activeIndex];
+    const user = useAtomValue(userAtom);
+    const navigate = useNavigate();
+
     const formatWeekOf = (dateStr: string) => {
         const d = new Date(dateStr);
         const day = d.getDate();
         const month = d.toLocaleString('en-GB', { month: 'short' });
         return `Week of ${day} ${month}`;
+    };
+
+    const onBuyTickets = () => {
+        if (user?.token) {
+            return;
+        }
+        navigate('/login');
     };
 
     useEffect(() => {
@@ -33,7 +46,7 @@ const Hero = () => {
             <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                 style={{ backgroundImage: `url(${movie.backdropUrl})` }}
-            />{' '}
+            />
             <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/40 to-black/30" />
             <div className="relative z-10 flex h-full w-full flex-col px-15">
                 <div className="flex w-145 flex-col gap-3 pt-65">
@@ -43,7 +56,7 @@ const Hero = () => {
                         <span>{weekLabel}</span>
                     </p>
 
-                    <div className="flex h-54 flex-col gap-4">
+                    <div className="flex h-54 flex-col gap-4.5">
                         <h2 className="text-display font-extrabold text-white">
                             {movie.title}
                         </h2>
@@ -75,14 +88,15 @@ const Hero = () => {
                         <div className="mt-2 flex flex-row gap-3">
                             <button
                                 type="button"
-                                className="bg-helper-red text-label-m flex items-center gap-1 rounded-full px-5.5 py-3.25 font-extrabold text-white"
+                                onClick={onBuyTickets}
+                                className="bg-helper-red text-label-m flex cursor-pointer items-center gap-1 rounded-full px-5.5 py-3.25 font-extrabold text-white"
                             >
                                 <TicketIcon />
                                 Buy tickets
                             </button>
                             <button
                                 type="button"
-                                className="text-label-m rounded-full bg-[#FFFFFF1A] px-5.5 py-3.25 font-extrabold text-white"
+                                className="text-label-m cursor-pointer rounded-full bg-[#FFFFFF1A] px-5.5 py-3.25 font-extrabold text-white"
                             >
                                 All sessions
                             </button>
