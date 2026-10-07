@@ -72,7 +72,7 @@ const UserProfile = () => {
 
             {open && (
                 <div className="absolute top-full right-0 z-50 mt-1 min-w-70">
-                    <ProfileDropDown me={me} />
+                    <ProfileDropDown me={me} onClose={() => setOpen(false)} />
                 </div>
             )}
         </div>

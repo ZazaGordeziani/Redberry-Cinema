@@ -5,7 +5,7 @@ import RecentlyViewed from '@/pages/main-page/components/recently-viewed';
 
 const MainPage = () => {
     return (
-        <div>
+        <div className="w-full">
             <Hero />
             <RecentlyViewed />
             <NowPlaying />

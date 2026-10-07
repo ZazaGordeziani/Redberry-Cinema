@@ -3,5 +3,5 @@ type PageContainerProps = {
 };
 
 export const PageContainer = ({ children }: PageContainerProps) => {
-    return <main className="flex grow overflow-hidden">{children}</main>;
+    return <main className="flex w-full grow overflow-hidden">{children}</main>;
 };

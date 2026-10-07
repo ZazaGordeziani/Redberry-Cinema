@@ -1,4 +1,5 @@
 import { getMe } from '@/api/auth';
+import { getFeaturedMovies } from '@/api/movies';
 import { getFilterOptions } from '@/api/venues';
 import { userAtom } from '@/store/auth';
 import { useQuery } from '@tanstack/react-query';
@@ -18,3 +19,8 @@ export const useVenues = () => {
         queryFn: getFilterOptions,
     });
 };
+export const useFeaturedMovies = () =>
+    useQuery({
+        queryKey: ['movies', 'featured'],
+        queryFn: getFeaturedMovies,
+    });

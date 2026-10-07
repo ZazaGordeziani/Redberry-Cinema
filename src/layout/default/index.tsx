@@ -9,7 +9,7 @@ const DefaultLayout = () => {
     console.log('hello');
     return (
         <div className="min-h-screen">
-            <div className="mx-auto flex w-full max-w-[1920px] flex-col justify-center">
+            <div className="relative mx-auto flex w-full max-w-[1920px] flex-col justify-center">
                 <Header />
                 <LogInView />
                 <RegisterView />

@@ -14,9 +14,10 @@ import ProfileIcon from '@/assets/profile-icon';
 
 type ProfileDropDownProps = {
     me: MeResponse;
+    onClose: () => void;
 };
 
-const ProfileDropDown = ({ me }: ProfileDropDownProps) => {
+const ProfileDropDown = ({ me, onClose }: ProfileDropDownProps) => {
     const setUser = useSetAtom(userAtom);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -119,7 +120,10 @@ const ProfileDropDown = ({ me }: ProfileDropDownProps) => {
             <div className="mt-5 flex flex-col gap-5">
                 <div
                     className="flex cursor-pointer items-center gap-2"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => {
+                        onClose();
+                        navigate('/profile');
+                    }}
                 >
                     <ProfileIcon />
                     <p className="text-label-m cursor-pointer font-semibold text-white">
