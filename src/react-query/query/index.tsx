@@ -1,5 +1,9 @@
 import { getMe } from '@/api/auth';
-import { getFeaturedMovies, getNowPlayingMovies } from '@/api/movies';
+import {
+    getComingSoonMovies,
+    getFeaturedMovies,
+    getNowPlayingMovies,
+} from '@/api/movies';
 import { getFilterOptions } from '@/api/venues';
 import { userAtom } from '@/store/auth';
 import { useQuery } from '@tanstack/react-query';
@@ -28,4 +32,9 @@ export const useNowPlayingMovies = () =>
     useQuery({
         queryKey: ['movies', 'now-playing'],
         queryFn: getNowPlayingMovies,
+    });
+export const useComingSoonMovies = () =>
+    useQuery({
+        queryKey: ['movies', 'coming-soon'],
+        queryFn: getComingSoonMovies,
     });

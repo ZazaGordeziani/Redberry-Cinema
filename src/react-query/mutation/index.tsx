@@ -5,6 +5,7 @@ import type {
     RegisterResponse,
     UpdateProfilePayload,
 } from '@/api/auth/index.types';
+import { toggleMovieNotify } from '@/api/movies';
 import type { LoginFormValues } from '@/components/authorization/modals/login/components/index.types';
 import type { RegisterFormValues } from '@/components/authorization/modals/register/components/index.types';
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
@@ -52,3 +53,14 @@ export const useUpdateProfile = (
         ...options,
     });
 };
+export const useToggleMovieNotify = (
+    options?: UseMutationOptions<
+        { movieId: number; subscribed: boolean },
+        AxiosError,
+        string
+    >,
+) =>
+    useMutation({
+        mutationFn: toggleMovieNotify,
+        ...options,
+    });
