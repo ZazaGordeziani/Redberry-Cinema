@@ -3,4 +3,6 @@ export const MOVIES_ENDPOINTS = {
     NOW_PLAYING: '/movies/now-playing',
     COMING_SOON: '/movies/coming-soon',
     NOTIFY: (slug: string) => `/movies/${slug}/notify`,
+    DETAIL: (slug: string) => `/movies/${slug}`,
+    SESSIONS: (slug: string) => `/movies/${slug}/sessions`,
 } as const;

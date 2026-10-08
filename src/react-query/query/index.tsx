@@ -2,6 +2,8 @@ import { getMe } from '@/api/auth';
 import {
     getComingSoonMovies,
     getFeaturedMovies,
+    getMovie,
+    getMovieSessions,
     getNowPlayingMovies,
 } from '@/api/movies';
 import { getFilterOptions } from '@/api/venues';
@@ -37,4 +39,16 @@ export const useComingSoonMovies = () =>
     useQuery({
         queryKey: ['movies', 'coming-soon'],
         queryFn: getComingSoonMovies,
+    });
+export const useMovie = (slug: string) =>
+    useQuery({
+        queryKey: ['movies', slug],
+        queryFn: () => getMovie(slug),
+        enabled: !!slug,
+    });
+export const useMovieSessions = (slug: string) =>
+    useQuery({
+        queryKey: ['movies', slug, 'sessions'],
+        queryFn: () => getMovieSessions(slug),
+        enabled: !!slug,
     });

@@ -29,3 +29,41 @@ export type FeaturedMovie = {
     }[];
     synopsis: string;
 };
+export type MovieDetail = FeaturedMovie & {
+    director: string;
+    cast: string;
+    availableDates: string[];
+};
+export type MovieVenue = {
+    id: number;
+    slug: string;
+    name: string;
+    city: string;
+};
+export type MovieSession = {
+    id: number;
+    startsAt: string;
+    date: string;
+    time: string;
+    timeBand: string;
+    price: number;
+    seatsLeft: number;
+    isSoldOut: boolean;
+    hall: {
+        id: number;
+        name: string;
+        venue: MovieVenue;
+    };
+    venue: MovieVenue;
+    format: FeaturedMovie['formats'][number];
+    language: {
+        id: number;
+        slug: string;
+        name: string;
+        code: string;
+    };
+};
+export type VenueSessions = {
+    venue: MovieVenue;
+    sessions: MovieSession[];
+};

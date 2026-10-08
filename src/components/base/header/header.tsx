@@ -9,8 +9,10 @@ const Header = () => {
     const user = useAtomValue(userAtom);
     const { pathname } = useLocation();
     const isHeroLayout =
-        pathname === '/' || pathname === '/login' || pathname === '/register';
-
+        pathname === '/' ||
+        pathname === '/login' ||
+        pathname === '/register' ||
+        pathname.startsWith('/movies/');
     return (
         <header
             className={`z-50 h-27.75 w-full px-15 pt-7.5 pb-10 ${

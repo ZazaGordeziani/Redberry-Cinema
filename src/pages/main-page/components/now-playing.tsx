@@ -114,6 +114,9 @@ const NowPlaying = () => {
 
                         return (
                             <article
+                                onClick={() =>
+                                    navigate(`/movies/${movie.slug}`)
+                                }
                                 key={movie.id}
                                 onMouseEnter={updateThumb}
                                 onMouseLeave={updateThumb}
@@ -150,7 +153,10 @@ const NowPlaying = () => {
                                     </p>
                                     <button
                                         type="button"
-                                        onClick={onBuyTicket}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onBuyTicket();
+                                        }}
                                         className="bg-helper-red text-label-m cursor-pointer rounded-full px-5.5 py-2.5 font-extrabold text-white"
                                     >
                                         Buy Ticket
