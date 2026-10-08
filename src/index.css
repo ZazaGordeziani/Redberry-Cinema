@@ -127,3 +127,30 @@ body {
 .now-playing-scroll::-webkit-scrollbar {
     display: none;
 }
+@keyframes hero-rise {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.hero-rise-title {
+    animation: hero-rise 0.5s ease-out both;
+}
+.hero-rise-rest {
+    animation: hero-rise 1s ease-out both;
+}
+@keyframes hero-zoom {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.08);
+    }
+}
+.hero-zoom {
+    animation: hero-zoom 4s ease-out forwards;
+}

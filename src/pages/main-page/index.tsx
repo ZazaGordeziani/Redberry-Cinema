@@ -9,7 +9,6 @@ const MainPage = () => {
             <Hero />
             <RecentlyViewed />
             <NowPlaying />
-            <NowPlaying />
             <div className="bg-background-tertiary h-px w-full" />
             <ComingSoon />
         </div>
