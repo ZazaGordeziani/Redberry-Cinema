@@ -14,3 +14,20 @@ export type Venue = {
 export type FilterOptionsResponse = {
     venues: Venue[];
 };
+export type FilterLanguage = {
+    id: number;
+    slug: string;
+    name: string;
+    code: string;
+};
+export type FilterChoice = {
+    id: string;
+    label: string;
+};
+export type FilterOptions = {
+    venues: Venue[];
+    formats: VenueFormat[];
+    languages: FilterLanguage[];
+    timeBands: FilterChoice[];
+    sorts: FilterChoice[];
+};

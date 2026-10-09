@@ -7,7 +7,7 @@ import {
     getNowPlayingMovies,
     searchMovies,
 } from '@/api/movies';
-import { getFilterOptions } from '@/api/venues';
+import { getCatalogueFilterOptions, getFilterOptions } from '@/api/venues';
 import { userAtom } from '@/store/auth';
 import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
@@ -58,4 +58,9 @@ export const useSearchMovies = (query: string) =>
         queryKey: ['movies', 'search', query],
         queryFn: () => searchMovies(query),
         enabled: query.trim().length > 0,
+    });
+export const useFilterOptions = () =>
+    useQuery({
+        queryKey: ['filter-options'],
+        queryFn: getCatalogueFilterOptions,
     });

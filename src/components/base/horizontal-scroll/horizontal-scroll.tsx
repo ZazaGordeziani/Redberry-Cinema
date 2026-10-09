@@ -8,10 +8,17 @@ import {
 
 type HorizontalScrollProps = {
     className?: string;
+    barClassName?: string;
+    showFade?: boolean;
     children: ReactNode;
 };
 
-const HorizontalScroll = ({ className, children }: HorizontalScrollProps) => {
+const HorizontalScroll = ({
+    className,
+    barClassName,
+    showFade = true,
+    children,
+}: HorizontalScrollProps) => {
     const scrollRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
     const [thumb, setThumb] = useState({ width: 0, left: 0 });
@@ -104,7 +111,7 @@ const HorizontalScroll = ({ className, children }: HorizontalScrollProps) => {
         <div className="relative">
             <div
                 ref={scrollRef}
-                className={`now-playing-scroll flex overflow-x-auto pb-3.75 ${className ?? ''}`}
+                className={`now-playing-scroll flex overflow-x-auto ${barClassName ? 'pb-0' : 'pb-3.75'} ${className ?? ''}`}
                 onWheel={(e) => {
                     if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
                         e.currentTarget.scrollLeft += e.deltaY;
@@ -118,7 +125,7 @@ const HorizontalScroll = ({ className, children }: HorizontalScrollProps) => {
                 <div
                     ref={trackRef}
                     onMouseDown={onTrackMouseDown}
-                    className="bg-light-grey-muted relative mt-4 h-1.5 w-full cursor-pointer rounded-[22px]"
+                    className={`bg-light-grey-muted relative h-1.5 w-full cursor-pointer rounded-[22px] ${barClassName ?? 'mt-4'}`}
                 >
                     <div
                         className="bg-helper-red absolute top-0 h-full cursor-pointer rounded-[22px]"
@@ -131,7 +138,7 @@ const HorizontalScroll = ({ className, children }: HorizontalScrollProps) => {
                 </div>
             )}
 
-            {canScroll && (
+            {canScroll && showFade && (
                 <div className="from-background pointer-events-none absolute top-0 right-0 bottom-3.75 z-10 w-20 bg-linear-to-l to-transparent" />
             )}
         </div>

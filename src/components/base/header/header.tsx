@@ -28,9 +28,11 @@ const Header = () => {
                             KINO <span className="text-helper-red">XII</span>
                         </h2>
                     </Link>
-                    <h3 className="text-body-s tracking-overline pt-0.5 font-semibold text-white">
-                        SESSIONS
-                    </h3>
+                    <Link to="/sessions" className="cursor-pointer">
+                        <h3 className="text-body-s tracking-overline cursor-pointer pt-0.5 font-semibold text-white">
+                            SESSIONS
+                        </h3>
+                    </Link>
                 </div>
                 <div className="flex gap-8">
                     <SearchBar />

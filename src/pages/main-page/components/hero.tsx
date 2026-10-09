@@ -100,6 +100,8 @@ const Hero = () => {
                         </button>
                         <button
                             type="button"
+                            onClick={() => navigate('/sessions')}
+
                             className="text-label-m cursor-pointer rounded-full bg-[#FFFFFF1A] px-5.5 py-3.25 font-extrabold text-white"
                         >
                             All sessions
