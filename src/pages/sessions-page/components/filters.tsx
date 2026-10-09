@@ -351,23 +351,25 @@ const Filters = () => {
                 </div>
             </section>
 
-            <Divider />
-            <div className="flex flex-col gap-4">
-                <button
-                    type="button"
-                    onClick={clearFilters}
-                    disabled={activeCount === 0}
-                    className={`text-label-s border-light-grey-muted w-full rounded-[999px] border py-2.5 font-semibold text-white ${
-                        activeCount === 0 ? 'invisible' : 'cursor-pointer'
-                    }`}
-                >
-                    Clear filters
-                </button>
-                <p className={`${secondaryText} text-center`}>
-                    {activeCount === 1
-                        ? '1 filter active'
-                        : `${activeCount} filters active`}
-                </p>
+            <div className="mt-auto flex flex-col gap-6">
+                <Divider />
+                <div className="flex flex-col gap-4">
+                    <button
+                        type="button"
+                        onClick={clearFilters}
+                        disabled={activeCount === 0}
+                        className={`text-label-s border-light-grey-muted w-full rounded-[999px] border py-2.5 font-semibold text-white ${
+                            activeCount === 0 ? 'invisible' : 'cursor-pointer'
+                        }`}
+                    >
+                        Clear filters
+                    </button>
+                    <p className={`${secondaryText} text-center`}>
+                        {activeCount === 1
+                            ? '1 filter active'
+                            : `${activeCount} filters active`}
+                    </p>
+                </div>
             </div>
         </aside>
     );
