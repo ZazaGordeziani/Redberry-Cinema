@@ -1,11 +1,10 @@
-import TicketIconGrey from '@/assets/ticket-icon-grey';
 import type { MovieSession, VenueSessions } from '@/api/movies/index.types';
 import CompleteProfileModal from '@/pages/movie-page/components/complete-profile-modal';
 import { useState } from 'react';
 import { userAtom } from '@/store/auth';
 import { useAtomValue } from 'jotai';
 import { useLocation, useNavigate } from 'react-router-dom';
-import TicketIcon from '@/assets/ticket-icon';
+import TicketIconSeats from '@/assets/ticket-icon-seats';
 type MovieSessionsProps = {
     venues: VenueSessions[];
     availableDates: string[];
@@ -49,6 +48,9 @@ const SessionTicket = ({ session }: { session: MovieSession }) => {
             </div>
 
             <div className="flex flex-col items-center justify-center gap-2 px-4 py-2">
+                <p className="text-h3 text-helper-red font-extrabold">
+                    ₾ {session.price}
+                </p>
                 <p
                     className={`text-body-s font-regular flex items-center gap-1 ${
                         session.seatsLeft <= 5
@@ -56,11 +58,9 @@ const SessionTicket = ({ session }: { session: MovieSession }) => {
                             : 'text-light-grey-muted'
                     }`}
                 >
-                    {session.seatsLeft <= 5 ? (
-                        <TicketIcon />
-                    ) : (
-                        <TicketIconGrey />
-                    )}{' '}
+                    <TicketIconSeats
+                        fill={session.seatsLeft <= 5 ? '#EC3013' : '#A9A9A9'}
+                    />{' '}
                     {session.seatsLeft} left
                 </p>
             </div>

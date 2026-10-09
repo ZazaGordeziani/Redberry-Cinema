@@ -134,7 +134,7 @@ const Hero = () => {
                                     i === 0 ? movies.length - 1 : i - 1,
                                 )
                             }
-                            className="flex h-13.5 w-13.5 items-center justify-center rounded-full bg-[#070C1C33]"
+                            className="flex h-13.5 w-13.5 cursor-pointer items-center justify-center rounded-full bg-[#070C1C33]"
                         >
                             <LeftArrow />
                         </button>
@@ -143,7 +143,7 @@ const Hero = () => {
                             onClick={() =>
                                 setActiveIndex((i) => (i + 1) % movies.length)
                             }
-                            className="flex h-13.5 w-13.5 items-center justify-center rounded-full bg-[#070C1C33]"
+                            className="flex h-13.5 w-13.5 cursor-pointer items-center justify-center rounded-full bg-[#070C1C33]"
                         >
                             <RightArrow />
                         </button>
