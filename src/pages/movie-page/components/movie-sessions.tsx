@@ -1,12 +1,14 @@
-import type { MovieSession, VenueSessions } from '@/api/movies/index.types';
+import type { MovieSession } from '@/api/movies/index.types';
 import CompleteProfileModal from '@/pages/movie-page/components/complete-profile-modal';
+import { useMovieSessions } from '@/react-query/query';
 import { useState } from 'react';
 import { userAtom } from '@/store/auth';
 import { useAtomValue } from 'jotai';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TicketIconSeats from '@/assets/ticket-icon-seats';
+import { BounceLoader } from 'react-spinners';
+
 type MovieSessionsProps = {
-    venues: VenueSessions[];
     availableDates: string[];
     profileComplete: boolean;
 };
@@ -69,10 +71,10 @@ const SessionTicket = ({ session }: { session: MovieSession }) => {
 };
 
 const MovieSessions = ({
-    venues,
     availableDates,
     profileComplete,
 }: MovieSessionsProps) => {
+    const { slug = '' } = useParams();
     const today = new Date();
     const todayKey = [
         today.getFullYear(),
@@ -84,6 +86,10 @@ const MovieSessions = ({
         .filter((date) => date >= todayKey)
         .slice(0, 7);
     const [selectedDate, setSelectedDate] = useState(upcomingDates[0] ?? '');
+    const { data: venues = [], isLoading } = useMovieSessions(
+        slug,
+        selectedDate,
+    );
     const [profileModalOpen, setProfileModalOpen] = useState(false);
 
     const user = useAtomValue(userAtom);
@@ -100,14 +106,7 @@ const MovieSessions = ({
         new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
             weekday: 'short',
         });
-    const visibleVenues = venues
-        .map((group) => ({
-            ...group,
-            sessions: group.sessions.filter(
-                (session) => session.date === selectedDate,
-            ),
-        }))
-        .filter((group) => group.sessions.length > 0);
+    const visibleVenues = venues.filter((group) => group.sessions.length > 0);
 
     const sessionCount = venues.reduce((total, group) => {
         return (
@@ -149,7 +148,15 @@ const MovieSessions = ({
             </div>
 
             <div className="flex flex-col gap-8.5 pt-3">
-                {visibleVenues.length === 0 ? (
+                {isLoading ? (
+                    <div className="flex justify-center py-10">
+                        <BounceLoader
+                            color="#EC3013"
+                            size={84}
+                            speedMultiplier={0.6}
+                        />
+                    </div>
+                ) : visibleVenues.length === 0 ? (
                     <p className="text-helper-red text-[32px] font-extrabold">
                         NO AVAILABLE SESSIONS
                     </p>
@@ -179,7 +186,7 @@ const MovieSessions = ({
                                         <div
                                             key={hallName}
                                             onClick={onHallClick}
-                                            className={`bg-background-secondary flex w-[fit] flex-col gap-2 p-4 rounded-[18px]${
+                                            className={`bg-background-secondary flex w-[fit] flex-col gap-2 rounded-2xl p-4 ${
                                                 profileComplete
                                                     ? ''
                                                     : 'cursor-pointer'

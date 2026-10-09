@@ -5,7 +5,9 @@ import {
     getMovie,
     getMovieSessions,
     getNowPlayingMovies,
+    getSessions,
     searchMovies,
+    type SessionsQuery,
 } from '@/api/movies';
 import { getCatalogueFilterOptions, getFilterOptions } from '@/api/venues';
 import { userAtom } from '@/store/auth';
@@ -47,11 +49,11 @@ export const useMovie = (slug: string) =>
         queryFn: () => getMovie(slug),
         enabled: !!slug,
     });
-export const useMovieSessions = (slug: string) =>
+export const useMovieSessions = (slug: string, date: string) =>
     useQuery({
-        queryKey: ['movies', slug, 'sessions'],
-        queryFn: () => getMovieSessions(slug),
-        enabled: !!slug,
+        queryKey: ['movies', slug, 'sessions', date],
+        queryFn: () => getMovieSessions(slug, date),
+        enabled: !!slug && !!date,
     });
 export const useSearchMovies = (query: string) =>
     useQuery({
@@ -63,4 +65,9 @@ export const useFilterOptions = () =>
     useQuery({
         queryKey: ['filter-options'],
         queryFn: getCatalogueFilterOptions,
+    });
+export const useSessions = (query: SessionsQuery) =>
+    useQuery({
+        queryKey: ['sessions', query],
+        queryFn: () => getSessions(query),
     });

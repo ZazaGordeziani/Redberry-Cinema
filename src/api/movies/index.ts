@@ -5,6 +5,8 @@ import type {
     MovieDetail,
     VenueSessions,
 } from '@/api/movies/index.types';
+import type { SessionsPage } from '@/api/movies/index.types';
+import qs from 'qs';
 
 export const getFeaturedMovies = async (): Promise<FeaturedMovie[]> => {
     const response = await httpClient.get(MOVIES_ENDPOINTS.FEATURED);
@@ -28,8 +30,11 @@ export const getMovie = async (slug: string): Promise<MovieDetail> => {
 };
 export const getMovieSessions = async (
     slug: string,
+    date: string,
 ): Promise<VenueSessions[]> => {
-    const response = await httpClient.get(MOVIES_ENDPOINTS.SESSIONS(slug));
+    const response = await httpClient.get(MOVIES_ENDPOINTS.SESSIONS(slug), {
+        params: { date },
+    });
     return response.data.data;
 };
 export const searchMovies = async (query: string): Promise<FeaturedMovie[]> => {
@@ -37,4 +42,32 @@ export const searchMovies = async (query: string): Promise<FeaturedMovie[]> => {
         params: { q: query },
     });
     return response.data.data;
+};
+
+export type SessionsQuery = {
+    date: string;
+    sort: string;
+    page: number;
+    venues: string[];
+    formats: string[];
+    languages: string[];
+    bands: string[];
+};
+export const getSessions = async (
+    query: SessionsQuery,
+): Promise<SessionsPage> => {
+    const response = await httpClient.get(MOVIES_ENDPOINTS.LIST, {
+        params: {
+            date: query.date,
+            sort: query.sort,
+            page: query.page,
+            venues: query.venues.length ? query.venues : undefined,
+            formats: query.formats.length ? query.formats : undefined,
+            languages: query.languages.length ? query.languages : undefined,
+            bands: query.bands.length ? query.bands : undefined,
+        },
+        paramsSerializer: (params) =>
+            qs.stringify(params, { arrayFormat: 'brackets', skipNulls: true }),
+    });
+    return response.data;
 };

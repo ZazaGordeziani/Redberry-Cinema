@@ -1,14 +1,14 @@
 import MovieDetails from '@/pages/movie-page/components/movie-details';
 import MovieHero from '@/pages/movie-page/components/movie-hero';
 import MovieSessions from '@/pages/movie-page/components/movie-sessions';
-import { useMe, useMovie, useMovieSessions } from '@/react-query/query';
+import { useMe, useMovie } from '@/react-query/query';
 import { useParams } from 'react-router-dom';
 import { rememberMovie } from '@/pages/main-page/components/recently-viewed-storage';
 import { useEffect } from 'react';
+
 const MoviePage = () => {
     const { slug = '' } = useParams();
     const { data: movie, isLoading: isMovieLoading } = useMovie(slug);
-    const { data: venues = [] } = useMovieSessions(slug);
     const { data: me, isLoading: isMeLoading } = useMe();
     useEffect(() => {
         if (!movie) return;
@@ -34,7 +34,6 @@ const MoviePage = () => {
                     </div>
                 ) : (
                     <MovieSessions
-                        venues={venues}
                         availableDates={movie.availableDates}
                         profileComplete={profileComplete}
                     />

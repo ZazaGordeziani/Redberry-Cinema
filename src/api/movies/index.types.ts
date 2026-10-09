@@ -67,3 +67,19 @@ export type VenueSessions = {
     venue: MovieVenue;
     sessions: MovieSession[];
 };
+
+export type CatalogueSession = MovieSession & {
+    movie: FeaturedMovie;
+};
+export type SessionGroup = {
+    movie: FeaturedMovie;
+    sessions: CatalogueSession[];
+};
+export type SessionsPage = {
+    data: SessionGroup[];
+    meta: {
+        totalSessions: number;
+        totalMovies: number;
+        lastPage: number;
+    };
+};

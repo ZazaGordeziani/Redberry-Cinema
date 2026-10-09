@@ -6,4 +6,5 @@ export const MOVIES_ENDPOINTS = {
     DETAIL: (slug: string) => `/movies/${slug}`,
     SESSIONS: (slug: string) => `/movies/${slug}/sessions`,
     SEARCH: '/search',
+    LIST: '/sessions',
 } as const;

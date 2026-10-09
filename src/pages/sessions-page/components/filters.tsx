@@ -356,11 +356,14 @@ const Filters = () => {
                 <button
                     type="button"
                     onClick={clearFilters}
-                    className="text-label-s border-light-grey-muted w-full cursor-pointer rounded-[999px] border py-2.5 font-semibold text-white"
+                    disabled={activeCount === 0}
+                    className={`text-label-s border-light-grey-muted w-full rounded-[999px] border py-2.5 font-semibold text-white ${
+                        activeCount === 0 ? 'invisible' : 'cursor-pointer'
+                    }`}
                 >
                     Clear filters
                 </button>
-                <p className={`${secondaryText} -mt-1 text-center`}>
+                <p className={`${secondaryText} text-center`}>
                     {activeCount === 1
                         ? '1 filter active'
                         : `${activeCount} filters active`}
