@@ -31,12 +31,12 @@ const NowPlaying = () => {
                         <article
                             key={movie.id}
 
-                            className="bg-background-secondary group flex w-65 shrink-0 flex-col rounded-[20px] p-3 shadow-[0_1px_4px_0_#00000033] transition-all duration-300 hover:w-111.75"
+                            className="bg-background-secondary group flex w-65 shrink-0 flex-col rounded-[20px] p-3 shadow-[0_1px_4px_0_#00000033] transition-all duration-[1.1s] hover:w-111.75"
                         >
                             <img
                                 src={movie.posterUrl}
                                 alt={movie.title}
-                                className="h-75 w-full rounded-xl object-cover transition-all duration-300 group-hover:h-55"
+                                className="h-75 w-full rounded-xl object-cover transition-all duration-[1.5s] group-hover:h-55"
                             />
 
                             <h3 className="text-h3 mt-2.25 font-extrabold text-white">
@@ -53,7 +53,7 @@ const NowPlaying = () => {
                                 {movie.ageRating.minAge}+
                             </p>
 
-                            <p className="text-body-m font-regular text-light-grey-muted mt-1.75 line-clamp-3 hidden pt-2 group-hover:block">
+                            <p className="text-body-m font-regular text-light-grey-muted line-clamp-3 max-h-0 overflow-hidden pt-0 opacity-0 transition-all duration-[1.5s] group-hover:max-h-20 group-hover:pt-2 group-hover:opacity-100">
                                 {movie.synopsis}
                             </p>
 

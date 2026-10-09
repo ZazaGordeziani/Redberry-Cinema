@@ -5,6 +5,7 @@ import {
     getMovie,
     getMovieSessions,
     getNowPlayingMovies,
+    searchMovies,
 } from '@/api/movies';
 import { getFilterOptions } from '@/api/venues';
 import { userAtom } from '@/store/auth';
@@ -51,4 +52,10 @@ export const useMovieSessions = (slug: string) =>
         queryKey: ['movies', slug, 'sessions'],
         queryFn: () => getMovieSessions(slug),
         enabled: !!slug,
+    });
+export const useSearchMovies = (query: string) =>
+    useQuery({
+        queryKey: ['movies', 'search', query],
+        queryFn: () => searchMovies(query),
+        enabled: query.trim().length > 0,
     });

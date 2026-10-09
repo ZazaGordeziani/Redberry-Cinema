@@ -32,3 +32,9 @@ export const getMovieSessions = async (
     const response = await httpClient.get(MOVIES_ENDPOINTS.SESSIONS(slug));
     return response.data.data;
 };
+export const searchMovies = async (query: string): Promise<FeaturedMovie[]> => {
+    const response = await httpClient.get(MOVIES_ENDPOINTS.SEARCH, {
+        params: { q: query },
+    });
+    return response.data.data;
+};

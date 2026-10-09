@@ -36,7 +36,6 @@ const ComingSoon = () => {
     });
 
     const onNotifyClick = (movie: FeaturedMovie) => {
-        if (movie.isNotified) return;
         if (!user?.token) {
             navigate('/login');
             return;
@@ -68,6 +67,8 @@ const ComingSoon = () => {
                     return (
                         <article
                             key={movie.id}
+                            onClick={() => navigate(`/movies/${movie.slug}`)}
+
                             className="bg-background-secondary flex h-43 w-117.5 shrink-0 flex-row gap-3.75 rounded-[20px] p-3 shadow-[0_1px_4px_0_#00000033]"
                         >
                             <img
@@ -98,7 +99,10 @@ const ComingSoon = () => {
                                 <button
                                     type="button"
                                     disabled={isPending || notified}
-                                    onClick={() => onNotifyClick(movie)}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        onNotifyClick(movie);
+                                    }}
                                     className={`text-label-s border-light-grey-muted mt-3 flex w-fit items-center gap-1 rounded-full border px-3 py-1.5 font-semibold ${
                                         notified
                                             ? 'text-light-grey-muted cursor-default'

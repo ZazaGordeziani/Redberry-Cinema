@@ -5,4 +5,5 @@ export const MOVIES_ENDPOINTS = {
     NOTIFY: (slug: string) => `/movies/${slug}/notify`,
     DETAIL: (slug: string) => `/movies/${slug}`,
     SESSIONS: (slug: string) => `/movies/${slug}/sessions`,
+    SEARCH: '/search',
 } as const;
