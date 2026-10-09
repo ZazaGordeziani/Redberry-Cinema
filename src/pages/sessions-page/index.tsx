@@ -17,16 +17,13 @@ const SessionsPage = () => {
         if (nextPage <= 1) delete next.page;
         else next.page = String(nextPage);
 
-        navigate(
-            {
-                pathname: location.pathname,
-                search: qs.stringify(next, {
-                    arrayFormat: 'repeat',
-                    skipNulls: true,
-                }),
-            },
-            { replace: true },
-        );
+        navigate({
+            pathname: location.pathname,
+            search: qs.stringify(next, {
+                arrayFormat: 'repeat',
+                skipNulls: true,
+            }),
+        });
     };
 
     return (

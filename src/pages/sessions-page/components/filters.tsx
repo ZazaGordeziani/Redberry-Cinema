@@ -126,7 +126,7 @@ const Filters = () => {
             { arrayFormat: 'repeat', skipNulls: true },
         );
 
-        navigate({ pathname: location.pathname, search }, { replace: true });
+        navigate({ pathname: location.pathname, search });
     };
 
     useEffect(() => {

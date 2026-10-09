@@ -25,16 +25,13 @@ const SessionSort = () => {
         next.sort = id;
         delete next.page;
 
-        navigate(
-            {
-                pathname: location.pathname,
-                search: qs.stringify(next, {
-                    arrayFormat: 'repeat',
-                    skipNulls: true,
-                }),
-            },
-            { replace: true },
-        );
+        navigate({
+            pathname: location.pathname,
+            search: qs.stringify(next, {
+                arrayFormat: 'repeat',
+                skipNulls: true,
+            }),
+        });
         setOpen(false);
     };
 
