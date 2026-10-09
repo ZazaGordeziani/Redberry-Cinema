@@ -23,6 +23,9 @@ export const Register = () => {
     const [, setUser] = useAtom(userAtom);
     const navigate = useNavigate();
     const location = useLocation();
+    const openedHere = Boolean(
+        (location.state as { register?: boolean } | null)?.register,
+    );
 
     const {
         control,
@@ -68,8 +71,6 @@ export const Register = () => {
             }
         },
         onSuccess: (data) => {
-            console.log('successfully registered', data.token);
-            navigate('/');
             setUser({
                 email: data.user.email,
                 token: data.token,
@@ -82,9 +83,17 @@ export const Register = () => {
             if (data.user.avatar) {
                 localStorage.setItem('avatar', data.user.avatar);
             }
+            if (openedHere) {
+                navigate(
+                    { pathname: location.pathname, search: location.search },
+                    { replace: true, state: null },
+                );
+                return;
+            }
+            navigate('/');
         },
     });
-    if (location.pathname !== '/register') {
+    if (location.pathname !== '/register' && !openedHere) {
         return null;
     }
     const onSubmit = (registerPayload: RegisterFormValues) => {
@@ -92,6 +101,13 @@ export const Register = () => {
     };
     const handleClose = () => {
         reset();
+        if (openedHere) {
+            navigate(
+                { pathname: location.pathname, search: location.search },
+                { replace: true, state: null },
+            );
+            return;
+        }
         navigate('/');
     };
     return (
@@ -486,7 +502,20 @@ export const Register = () => {
                                     Already have an account?
                                 </p>
 
-                                <Link to={`/login`}>
+                                <Link
+                                    to={
+                                        openedHere
+                                            ? {
+                                                  pathname: location.pathname,
+                                                  search: location.search,
+                                              }
+                                            : '/login'
+                                    }
+                                    state={
+                                        openedHere ? { login: true } : undefined
+                                    }
+                                >
+                                    {' '}
                                     <button>
                                         <span className="text-label-m text-helper-red font-extrabold">
                                             Log In

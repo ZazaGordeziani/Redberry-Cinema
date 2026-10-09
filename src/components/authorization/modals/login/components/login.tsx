@@ -256,7 +256,22 @@ export const Login = () => {
                                     Don&apos;t have an account?
                                 </p>
 
-                                <Link to={`/register`}>
+                                <Link
+                                    to={
+                                        openedHere
+                                            ? {
+                                                  pathname: location.pathname,
+                                                  search: location.search,
+                                              }
+                                            : '/register'
+                                    }
+                                    state={
+                                        openedHere
+                                            ? { register: true }
+                                            : undefined
+                                    }
+                                >
+                                    {' '}
                                     <button>
                                         <span className="text-helper-red text-label-m font-extrabold">
                                             Sign up
