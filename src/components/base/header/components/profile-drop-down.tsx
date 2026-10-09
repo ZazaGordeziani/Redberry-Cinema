@@ -35,7 +35,6 @@ const ProfileDropDown = ({ me, onClose }: ProfileDropDownProps) => {
     const { mutate: handleLogout } = useLogout({
         onSettled: () => {
             clearAuthStorage();
-            navigate('/');
         },
     });
 

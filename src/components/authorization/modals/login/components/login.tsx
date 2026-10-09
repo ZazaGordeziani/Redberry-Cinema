@@ -70,7 +70,10 @@ export const Login = () => {
             httpClient.defaults.headers.common['Authorization'] =
                 `Bearer ${data.token}`;
             if (location.state?.login) {
-                navigate(location.pathname, { replace: true });
+                navigate(
+                    { pathname: location.pathname, search: location.search },
+                    { replace: true, state: null },
+                );
                 return;
             }
 
@@ -98,7 +101,10 @@ export const Login = () => {
     const handleClose = () => {
         reset();
         if (location.state?.login) {
-            navigate(location.pathname, { replace: true, state: null });
+            navigate(
+                { pathname: location.pathname, search: location.search },
+                { replace: true, state: null },
+            );
             return;
         }
         navigate('/');
