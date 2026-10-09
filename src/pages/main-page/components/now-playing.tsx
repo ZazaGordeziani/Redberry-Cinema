@@ -1,21 +1,14 @@
 import { useNowPlayingMovies } from '@/react-query/query';
-import { userAtom } from '@/store/auth';
-import { useAtomValue } from 'jotai';
+
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const NowPlaying = () => {
     const { data: movies = [], isLoading } = useNowPlayingMovies();
-    const user = useAtomValue(userAtom);
     const navigate = useNavigate();
     const scrollRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
     const [thumb, setThumb] = useState({ width: 0, left: 0 });
-
-    const onBuyTicket = () => {
-        if (user?.token) return;
-        navigate('/login');
-    };
 
     const updateThumb = () => {
         const el = scrollRef.current;
@@ -114,13 +107,10 @@ const NowPlaying = () => {
 
                         return (
                             <article
-                                onClick={() =>
-                                    navigate(`/movies/${movie.slug}`)
-                                }
                                 key={movie.id}
                                 onMouseEnter={updateThumb}
                                 onMouseLeave={updateThumb}
-                                className="bg-background-secondary group flex w-65 shrink-0 cursor-pointer flex-col rounded-[20px] p-3 shadow-[0_1px_4px_0_#00000033] transition-all duration-300 hover:w-111.75"
+                                className="bg-background-secondary group flex w-65 shrink-0 flex-col rounded-[20px] p-3 shadow-[0_1px_4px_0_#00000033] transition-all duration-300 hover:w-111.75"
                             >
                                 <img
                                     src={movie.posterUrl}
@@ -153,10 +143,9 @@ const NowPlaying = () => {
                                     </p>
                                     <button
                                         type="button"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            onBuyTicket();
-                                        }}
+                                        onClick={() =>
+                                            navigate(`/movies/${movie.slug}`)
+                                        }
                                         className="bg-helper-red text-label-m cursor-pointer rounded-full px-5.5 py-2.5 font-extrabold text-white"
                                     >
                                         Buy Ticket

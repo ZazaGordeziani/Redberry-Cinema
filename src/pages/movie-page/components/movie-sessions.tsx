@@ -2,17 +2,15 @@ import TicketIconGrey from '@/assets/ticket-icon-grey';
 import type { MovieSession, VenueSessions } from '@/api/movies/index.types';
 import CompleteProfileModal from '@/pages/movie-page/components/complete-profile-modal';
 import { useState } from 'react';
-
+import { userAtom } from '@/store/auth';
+import { useAtomValue } from 'jotai';
+import { useLocation, useNavigate } from 'react-router-dom';
+import TicketIcon from '@/assets/ticket-icon';
 type MovieSessionsProps = {
     venues: VenueSessions[];
     availableDates: string[];
     profileComplete: boolean;
 };
-
-const weekdayOf = (dateStr: string) =>
-    new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
-        weekday: 'short',
-    });
 
 const dayNumberOf = (dateStr: string) =>
     new Date(`${dateStr}T00:00:00`).getDate();
@@ -51,11 +49,18 @@ const SessionTicket = ({ session }: { session: MovieSession }) => {
             </div>
 
             <div className="flex flex-col items-center justify-center gap-2 px-4 py-2">
-                <p className="text-h3 text-helper-red font-extrabold">
-                    ₾ {session.price}
-                </p>
-                <p className="text-body-s font-regular text-light-grey-muted flex items-center gap-1">
-                    <TicketIconGrey />
+                <p
+                    className={`text-body-s font-regular flex items-center gap-1 ${
+                        session.seatsLeft <= 5
+                            ? 'text-helper-red'
+                            : 'text-light-grey-muted'
+                    }`}
+                >
+                    {session.seatsLeft <= 5 ? (
+                        <TicketIcon />
+                    ) : (
+                        <TicketIconGrey />
+                    )}{' '}
                     {session.seatsLeft} left
                 </p>
             </div>
@@ -68,9 +73,33 @@ const MovieSessions = ({
     availableDates,
     profileComplete,
 }: MovieSessionsProps) => {
-    const [selectedDate, setSelectedDate] = useState(availableDates[0] ?? '');
+    const today = new Date();
+    const todayKey = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, '0'),
+        String(today.getDate()).padStart(2, '0'),
+    ].join('-');
+
+    const upcomingDates = availableDates
+        .filter((date) => date >= todayKey)
+        .slice(0, 7);
+    const [selectedDate, setSelectedDate] = useState(upcomingDates[0] ?? '');
     const [profileModalOpen, setProfileModalOpen] = useState(false);
 
+    const user = useAtomValue(userAtom);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const onHallClick = () => {
+        if (!user?.token) {
+            navigate(location.pathname, { state: { login: true } });
+            return;
+        }
+        if (!profileComplete) setProfileModalOpen(true);
+    };
+    const weekdayOf = (dateStr: string) =>
+        new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
+            weekday: 'short',
+        });
     const visibleVenues = venues
         .map((group) => ({
             ...group,
@@ -80,16 +109,23 @@ const MovieSessions = ({
         }))
         .filter((group) => group.sessions.length > 0);
 
-    const onHallClick = () => {
-        if (!profileComplete) setProfileModalOpen(true);
-    };
+    const sessionCount = venues.reduce((total, group) => {
+        return (
+            total +
+            group.sessions.filter((session) =>
+                upcomingDates.includes(session.date),
+            ).length
+        );
+    }, 0);
 
     return (
         <div className="flex w-3/4 flex-col">
-            <h2 className="text-h2 mb-6 font-extrabold text-white">Sessions</h2>
-
+            <h2 className="text-h2 mb-2 font-extrabold text-white">Sessions</h2>
+            <p className="text-label-m font-regular text-light-grey-muted mb-4">
+                {sessionCount} sessions over the next seven days
+            </p>
             <div className="mb-6 flex flex-row gap-1.75">
-                {availableDates.map((date) => {
+                {upcomingDates.map((date) => {
                     const isActive = date === selectedDate;
 
                     return (

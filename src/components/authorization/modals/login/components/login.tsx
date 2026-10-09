@@ -15,16 +15,18 @@ import CheckMark from '@/assets/check-mark';
 import ExclamationMark from '@/assets/exclamation-mark';
 
 export const Login = () => {
-    const [, setUser] = useAtom(userAtom);
-
-    type LocationState = {
-        from?: Location;
-    };
-
     const navigate = useNavigate();
     const location = useLocation() as Location & {
         state: LocationState;
     };
+    const [, setUser] = useAtom(userAtom);
+    const openedHere = Boolean(location.state?.login);
+
+    type LocationState = {
+        from?: Location;
+        login?: boolean;
+    };
+
     const from = location.state?.from
         ? location.state?.from?.pathname + location.state?.from?.search
         : '/';
@@ -67,6 +69,10 @@ export const Login = () => {
             });
             httpClient.defaults.headers.common['Authorization'] =
                 `Bearer ${data.token}`;
+            if (location.state?.login) {
+                navigate(location.pathname, { replace: true });
+                return;
+            }
 
             navigate(from, { replace: true });
         },
@@ -85,12 +91,16 @@ export const Login = () => {
     const onSubmit = (formData: LoginFormValues) => {
         handleLogin(formData);
     };
-    if (location.pathname !== '/login') {
+    if (location.pathname !== '/login' && !openedHere) {
         return null;
     }
 
     const handleClose = () => {
         reset();
+        if (location.state?.login) {
+            navigate(location.pathname, { replace: true, state: null });
+            return;
+        }
         navigate('/');
     };
     return (

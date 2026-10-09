@@ -24,9 +24,8 @@ const MoviePage = () => {
                 {isUnderAge ? (
                     <div className="flex min-h-80 w-3/4 items-center justify-center px-6">
                         <p className="text-display text-helper-red text-center font-extrabold">
-                            Age Restriction - You Are Not Allowed to Buy Ticket
-                            for this Movie, Must be at Least{' '}
-                            {movie.ageRating.minAge} Years Old!!!
+                            This film is rated {movie.ageRating.minAge}+. You
+                            cannot buy tickets for it with this account.
                         </p>
                     </div>
                 ) : (
