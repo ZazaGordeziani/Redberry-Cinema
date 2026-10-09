@@ -94,7 +94,7 @@ export const SearchBar = () => {
                         </p>
                     </div>
 
-                    <div className="mt-2 flex flex-col gap-3">
+                    <div className="mt-2 flex flex-col">
                         {results.map((movie) => (
                             <button
                                 key={movie.id}
@@ -102,12 +102,12 @@ export const SearchBar = () => {
                                 onClick={() =>
                                     navigate(`/movies/${movie.slug}`)
                                 }
-                                className="flex h-18 w-full items-center pt-2 pr-5 pb-5 pl-5"
+                                className="flex h-18 w-full items-center rounded-[10px] py-2 pr-5 pl-5 hover:cursor-pointer hover:bg-[#FFFFFF1A]"
                             >
                                 <img
                                     src={movie.posterUrl}
                                     alt={movie.title}
-                                    className="h-16 w-11 shrink-0 rounded object-cover"
+                                    className="h-14 w-11 shrink-0 rounded object-cover"
                                 />
 
                                 <div className="ml-4 flex min-w-0 flex-1 flex-col">
