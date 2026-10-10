@@ -83,3 +83,37 @@ export type SessionsPage = {
         lastPage: number;
     };
 };
+export type SeatState = 'available' | 'sold' | 'held' | 'unavailable';
+export type Seat = {
+    id: number;
+    code: string;
+    label: string;
+    state: SeatState;
+    aisleAfter: boolean;
+    isMine: boolean;
+};
+export type SeatRow = { label: string; seats: Seat[] };
+export type SeatSection = { name: string; rows: SeatRow[] };
+export type SeatMap = {
+    sessionId: number;
+    hall: { id: number; name: string; venue: MovieVenue };
+    sections: SeatSection[];
+};
+export type HoldSeat = {
+    seatId: number;
+    ticketType: 'adult' | 'student' | 'child';
+};
+export type HoldResult = {
+    holdId: string;
+    sessionId: number;
+    expiresAt: string;
+    secondsRemaining: number;
+    isLive: boolean;
+    subtotal: number;
+    seats: {
+        seatId: number;
+        code: string;
+        ticketType: { slug: string; name: string };
+        price: number;
+    }[];
+};

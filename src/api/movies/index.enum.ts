@@ -7,4 +7,7 @@ export const MOVIES_ENDPOINTS = {
     SESSIONS: (slug: string) => `/movies/${slug}/sessions`,
     SEARCH: '/search',
     LIST: '/sessions',
+    SEATS: (sessionId: number) => `/sessions/${sessionId}/seats`,
+    HOLDS: (sessionId: number) => `/sessions/${sessionId}/holds`,
+    RELEASE: (holdId: string) => `/holds/${holdId}`,
 } as const;

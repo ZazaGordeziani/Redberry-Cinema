@@ -1,25 +1,54 @@
 import type { MovieSession } from '@/api/movies/index.types';
-import CompleteProfileModal from '@/pages/movie-page/components/complete-profile-modal';
+import { useOpenSession } from '@/components/booking/open-session';
 import { useMovieSessions } from '@/react-query/query';
 import { useState } from 'react';
-import { userAtom } from '@/store/auth';
-import { useAtomValue } from 'jotai';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import TicketIconSeats from '@/assets/ticket-icon-seats';
 import { BounceLoader } from 'react-spinners';
 
 type MovieSessionsProps = {
+    movieTitle: string;
+    minAge: number;
     availableDates: string[];
-    profileComplete: boolean;
 };
 
 const dayNumberOf = (dateStr: string) =>
     new Date(`${dateStr}T00:00:00`).getDate();
 
-const SessionTicket = ({ session }: { session: MovieSession }) => {
+const SessionTicket = ({
+    session,
+    movieTitle,
+    minAge,
+}: {
+    session: MovieSession;
+    movieTitle: string;
+    minAge: number;
+}) => {
+    const openSession = useOpenSession();
+
     return (
-        <div className="bg-background flex flex-row items-stretch rounded-lg shadow-[0_1px_2px_0_#00000033]">
-            <div className="flex cursor-pointer flex-col items-center gap-2 px-4.5 py-2.5">
+        <div
+            className={`bg-background flex flex-row items-stretch rounded-lg shadow-[0_1px_2px_0_#00000033] ${
+                session.isSoldOut ? 'opacity-40' : 'cursor-pointer'
+            }`}
+            onClick={() => {
+                if (session.isSoldOut) return;
+
+                openSession({
+                    sessionId: session.id,
+                    movieTitle,
+                    minAge,
+                    venueName: session.venue.name,
+                    hallName: session.hall.name,
+                    date: session.date,
+                    time: session.time,
+                    formatName: session.format.name,
+                    languageName: session.language.name,
+                    price: session.price,
+                });
+            }}
+        >
+            <div className="flex flex-col items-center gap-2 px-4.5 py-2.5">
                 <p className="text-h2 font-extrabold text-white">
                     {session.time}
                 </p>
@@ -71,8 +100,9 @@ const SessionTicket = ({ session }: { session: MovieSession }) => {
 };
 
 const MovieSessions = ({
+    movieTitle,
+    minAge,
     availableDates,
-    profileComplete,
 }: MovieSessionsProps) => {
     const { slug = '' } = useParams();
     const today = new Date();
@@ -90,18 +120,7 @@ const MovieSessions = ({
         slug,
         selectedDate,
     );
-    const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-    const user = useAtomValue(userAtom);
-    const navigate = useNavigate();
-    const location = useLocation();
-    const onHallClick = () => {
-        if (!user?.token) {
-            navigate(location.pathname, { state: { login: true } });
-            return;
-        }
-        if (!profileComplete) setProfileModalOpen(true);
-    };
     const weekdayOf = (dateStr: string) =>
         new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
             weekday: 'short',
@@ -185,12 +204,7 @@ const MovieSessions = ({
                                     {hallEntries.map(([hallName, sessions]) => (
                                         <div
                                             key={hallName}
-                                            onClick={onHallClick}
-                                            className={`bg-background-secondary flex w-[fit] flex-col gap-2 rounded-2xl p-4 ${
-                                                profileComplete
-                                                    ? ''
-                                                    : 'cursor-pointer'
-                                            }`}
+                                            className="bg-background-secondary flex w-[fit] flex-col gap-2 rounded-2xl p-4"
                                         >
                                             <p className="text-label-s font-semibold text-white">
                                                 Hall {hallName}
@@ -200,6 +214,8 @@ const MovieSessions = ({
                                                     <SessionTicket
                                                         key={session.id}
                                                         session={session}
+                                                        movieTitle={movieTitle}
+                                                        minAge={minAge}
                                                     />
                                                 ))}
                                             </div>
@@ -211,12 +227,6 @@ const MovieSessions = ({
                     })
                 )}
             </div>
-
-            {profileModalOpen && (
-                <CompleteProfileModal
-                    onClose={() => setProfileModalOpen(false)}
-                />
-            )}
         </div>
     );
 };

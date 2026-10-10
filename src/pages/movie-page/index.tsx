@@ -34,8 +34,9 @@ const MoviePage = () => {
                     </div>
                 ) : (
                     <MovieSessions
+                        movieTitle={movie.title}
+                        minAge={movie.ageRating.minAge}
                         availableDates={movie.availableDates}
-                        profileComplete={profileComplete}
                     />
                 )}
                 <MovieDetails movie={movie} />

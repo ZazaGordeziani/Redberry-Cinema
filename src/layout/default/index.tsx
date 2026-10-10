@@ -3,6 +3,7 @@ import RegisterView from '@/components/authorization/modals/register/view';
 import Footer from '@/components/base/footer';
 import Header from '@/components/base/header/header';
 import { PageContainer } from '@/components/base/page-container/page-container';
+import BookingModal from '@/components/booking/booking-modal';
 import { Outlet } from 'react-router';
 
 const DefaultLayout = () => {
@@ -13,7 +14,7 @@ const DefaultLayout = () => {
                 <Header />
                 <LogInView />
                 <RegisterView />
-
+                <BookingModal />
                 <PageContainer>
                     <Outlet />
                 </PageContainer>

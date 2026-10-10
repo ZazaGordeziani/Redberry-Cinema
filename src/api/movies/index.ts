@@ -2,7 +2,10 @@ import { httpClient } from '@/api';
 import { MOVIES_ENDPOINTS } from '@/api/movies/index.enum';
 import type {
     FeaturedMovie,
+    HoldResult,
+    HoldSeat,
     MovieDetail,
+    SeatMap,
     VenueSessions,
 } from '@/api/movies/index.types';
 import type { SessionsPage } from '@/api/movies/index.types';
@@ -70,4 +73,17 @@ export const getSessions = async (
             qs.stringify(params, { arrayFormat: 'brackets', skipNulls: true }),
     });
     return response.data;
+};
+export const getSeatMap = async (sessionId: number): Promise<SeatMap> => {
+    const response = await httpClient.get(MOVIES_ENDPOINTS.SEATS(sessionId));
+    return response.data.data;
+};
+export const holdSeats = async (sessionId: number, seats: HoldSeat[]) => {
+    const response = await httpClient.post(MOVIES_ENDPOINTS.HOLDS(sessionId), {
+        seats,
+    });
+    return response.data.data as HoldResult;
+};
+export const releaseHold = async (holdId: string) => {
+    await httpClient.delete(MOVIES_ENDPOINTS.RELEASE(holdId));
 };

@@ -5,6 +5,7 @@ import {
     getMovie,
     getMovieSessions,
     getNowPlayingMovies,
+    getSeatMap,
     getSessions,
     searchMovies,
     type SessionsQuery,
@@ -70,4 +71,11 @@ export const useSessions = (query: SessionsQuery) =>
     useQuery({
         queryKey: ['sessions', query],
         queryFn: () => getSessions(query),
+    });
+export const useSeatMap = (sessionId: number | null) =>
+    useQuery({
+        queryKey: ['sessions', sessionId, 'seats'],
+        queryFn: () => getSeatMap(sessionId as number),
+        enabled: sessionId != null,
+        refetchInterval: 15000,
     });

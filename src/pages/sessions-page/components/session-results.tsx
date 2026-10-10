@@ -1,14 +1,12 @@
 import type { CatalogueSession, FeaturedMovie } from '@/api/movies/index.types';
 import type { SessionsQuery } from '@/api/movies';
 import HorizontalScroll from '@/components/base/horizontal-scroll/horizontal-scroll';
-import { useFilterOptions, useMe, useSessions } from '@/react-query/query';
+import { useFilterOptions, useSessions } from '@/react-query/query';
 import qs from 'qs';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SessionSort from '@/pages/sessions-page/components/session-sort';
-import { useAtomValue } from 'jotai';
-import CompleteProfileModal from '@/pages/movie-page/components/complete-profile-modal';
-import { userAtom } from '@/store/auth';
+import { useOpenSession } from '@/components/booking/open-session';
 
 const asList = (value: unknown) => {
     if (Array.isArray(value)) return value.map(String);
@@ -40,73 +38,64 @@ const SeatTicket = ({ fill }: { fill: string }) => (
 const SessionCard = ({ session }: { session: CatalogueSession }) => {
     const low = session.isSoldOut || session.seatsLeft < 6;
     const tone = low ? '#EC3013' : '#4ADE80';
-    const user = useAtomValue(userAtom);
-    const { data: me } = useMe();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [profileModalOpen, setProfileModalOpen] = useState(false);
+    const openSession = useOpenSession();
 
     const onSessionClick = () => {
         if (session.isSoldOut) return;
 
-        if (!user?.token) {
-            navigate(
-                { pathname: location.pathname, search: location.search },
-                { state: { login: true } },
-            );
-            return;
-        }
-
-        if (!me?.profileComplete) setProfileModalOpen(true);
+        openSession({
+            sessionId: session.id,
+            movieTitle: session.movie.title,
+            minAge: session.movie.ageRating.minAge,
+            venueName: session.venue.name,
+            hallName: session.hall.name,
+            date: session.date,
+            time: session.time,
+            formatName: session.format.name,
+            languageName: session.language.name,
+            price: session.price,
+        });
     };
 
     return (
-        <>
-            <article
-                onClick={onSessionClick}
-                className={`bg-background-secondary flex w-63 shrink-0 flex-col gap-2.5 rounded-2xl p-3.75 ${
-                    session.isSoldOut ? 'opacity-40' : 'cursor-pointer'
-                }`}
-            >
-                <div className="flex items-center justify-between gap-4">
-                    <p className="text-h3 font-extrabold text-white">
-                        {session.time}
-                    </p>
-                    <span className="bg-background-tertiary text-label-s rounded-full px-2.5 py-1.25 font-semibold text-white">
-                        {session.format.name}
-                    </span>
-                </div>
+        <article
+            onClick={onSessionClick}
+            className={`bg-background-secondary flex w-63 shrink-0 flex-col gap-2.5 rounded-2xl p-3.75 ${
+                session.isSoldOut ? 'opacity-40' : 'cursor-pointer'
+            }`}
+        >
+            <div className="flex items-center justify-between gap-4">
+                <p className="text-h3 font-extrabold text-white">
+                    {session.time}
+                </p>
+                <span className="bg-background-tertiary text-label-s rounded-full px-2.5 py-1.25 font-semibold text-white">
+                    {session.format.name}
+                </span>
+            </div>
 
-                <div className="flex items-center justify-between gap-4">
-                    <p className="text-body-s font-regular text-light-grey-muted">
-                        {languageLabel(session.language.name)}
-                    </p>
-                    <p
-                        className="text-body-s font-regular flex items-center gap-1"
-                        style={{ color: tone }}
-                    >
-                        <SeatTicket fill={tone} />
-                        {session.seatsLeft} left
-                    </p>
-                </div>
+            <div className="flex items-center justify-between gap-4">
+                <p className="text-body-s font-regular text-light-grey-muted">
+                    {languageLabel(session.language.name)}
+                </p>
+                <p
+                    className="text-body-s font-regular flex items-center gap-1"
+                    style={{ color: tone }}
+                >
+                    <SeatTicket fill={tone} />
+                    {session.seatsLeft} left
+                </p>
+            </div>
 
-                <div className="flex items-center justify-between gap-4">
-                    <p className="text-label-s font-semibold text-white">
-                        {session.venue.name} · Hall{' '}
-                        {session.hall.name.toUpperCase()}
-                    </p>
-                    <p className="text-label-m font-extrabold text-white">
-                        ₾{session.price}
-                    </p>
-                </div>
-            </article>
-
-            {profileModalOpen && (
-                <CompleteProfileModal
-                    onClose={() => setProfileModalOpen(false)}
-                />
-            )}
-        </>
+            <div className="flex items-center justify-between gap-4">
+                <p className="text-label-s font-semibold text-white">
+                    {session.venue.name} · Hall{' '}
+                    {session.hall.name.toUpperCase()}
+                </p>
+                <p className="text-label-m font-extrabold text-white">
+                    ₾{session.price}
+                </p>
+            </div>
+        </article>
     );
 };
 
@@ -124,7 +113,7 @@ const MovieRow = ({
             <button
                 type="button"
                 onClick={() => navigate(`/movies/${movie.slug}`)}
-                className="flex cursor-pointer items-center gap-4 text-left"
+                className="flex w-fit cursor-pointer items-center gap-4 text-left"
             >
                 <img
                     src={movie.posterUrl}
@@ -223,7 +212,7 @@ const SessionResults = ({
                     </p>
                 </div>
             ) : (
-                <div className="[&::-webkit-scrollbar-thumb]:bg-helper-red mt-6 max-h-screen scrollbar-thin [scrollbar-color:#EC3013_transparent] overflow-y-auto [&::-webkit-scrollbar]:w-0.75 [&::-webkit-scrollbar-track]:bg-transparent">
+                <div className="[&::-webkit-scrollbar-thumb]:bg-helper-red mt-6 ml-3 max-h-screen scrollbar-thin [scrollbar-color:#EC3013_transparent] overflow-y-auto [&::-webkit-scrollbar]:w-0.75 [&::-webkit-scrollbar-thumb]:border-l-[5px] [&::-webkit-scrollbar-track]:bg-transparent">
                     {groups.map((group, index) => (
                         <div key={group.movie.id}>
                             <MovieRow
