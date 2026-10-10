@@ -3,8 +3,7 @@ import RightArrow from '@/assets/right-arrow';
 import RuntimeIcon from '@/assets/runtime-icon';
 import TicketIcon from '@/assets/ticket-icon';
 import { useFeaturedMovies } from '@/react-query/query';
-import { userAtom } from '@/store/auth';
-import { useAtomValue } from 'jotai';
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +11,6 @@ const Hero = () => {
     const { data: movies = [], isLoading } = useFeaturedMovies();
     const [activeIndex, setActiveIndex] = useState(0);
     const movie = movies[activeIndex];
-    const user = useAtomValue(userAtom);
     const navigate = useNavigate();
 
     const formatWeekOf = (dateStr: string) => {
@@ -23,10 +21,7 @@ const Hero = () => {
     };
 
     const onBuyTickets = () => {
-        if (user?.token) {
-            return;
-        }
-        navigate('/login');
+        navigate(`/movies/${movie.slug}`);
     };
 
     useEffect(() => {

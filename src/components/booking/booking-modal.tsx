@@ -391,7 +391,7 @@ const BookingModal = () => {
                 order={order}
                 onTickets={() => {
                     setOrder(null);
-                    navigate('/profile', { state: { tab: 'tickets' } });
+                    navigate('/profile?tab=tickets');
                 }}
                 onHome={() => {
                     setOrder(null);

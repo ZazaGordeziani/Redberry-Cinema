@@ -39,11 +39,15 @@ const SessionsPage = () => {
             </div>
 
             <div className="mt-15 ml-33 flex justify-center">
-                <Pagination
-                    page={page}
-                    lastPage={Math.max(lastPage, 1)}
-                    onPageChange={goToPage}
-                />
+                {lastPage > 0 && (
+                    <div className="mt-15 ml-33 flex justify-center">
+                        <Pagination
+                            page={page}
+                            lastPage={lastPage}
+                            onPageChange={goToPage}
+                        />
+                    </div>
+                )}
             </div>
         </section>
     );

@@ -1,7 +1,12 @@
-import type { CatalogueSession, FeaturedMovie } from '@/api/movies/index.types';
-import type { SessionsQuery } from '@/api/movies';
+import type {
+    CatalogueSession,
+    FeaturedMovie,
+    SessionGroup,
+} from '@/api/movies/index.types';
+import { getSessions, type SessionsQuery } from '@/api/movies';
 import HorizontalScroll from '@/components/base/horizontal-scroll/horizontal-scroll';
-import { useFilterOptions, useSessions } from '@/react-query/query';
+import { useFilterOptions } from '@/react-query/query';
+import { useQueries } from '@tanstack/react-query';
 import qs from 'qs';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -14,13 +19,48 @@ const asList = (value: unknown) => {
     return [String(value)];
 };
 
-const todayKey = () => {
-    const today = new Date();
-    return [
-        today.getFullYear(),
-        String(today.getMonth() + 1).padStart(2, '0'),
-        String(today.getDate()).padStart(2, '0'),
-    ].join('-');
+const nextSevenDays = () =>
+    Array.from({ length: 7 }, (_, index) => {
+        const day = new Date();
+        day.setHours(0, 0, 0, 0);
+        day.setDate(day.getDate() + index);
+        return [
+            day.getFullYear(),
+            String(day.getMonth() + 1).padStart(2, '0'),
+            String(day.getDate()).padStart(2, '0'),
+        ].join('-');
+    });
+
+const stillBookable = (date: string, time: string) =>
+    Date.now() <= new Date(`${date}T${time}:00`).getTime() + 10 * 60 * 1000;
+const PAGE_SIZE = 10;
+const mergeGroups = (pages: SessionGroup[][]) => {
+    const byMovie = new Map<number, SessionGroup>();
+
+    pages.forEach((groups) => {
+        groups.forEach((group) => {
+            const existing = byMovie.get(group.movie.id);
+            if (!existing) {
+                byMovie.set(group.movie.id, {
+                    ...group,
+                    sessions: [...group.sessions],
+                });
+                return;
+            }
+
+            const ids = new Set(existing.sessions.map((session) => session.id));
+            existing.sessions.push(
+                ...group.sessions.filter((session) => !ids.has(session.id)),
+            );
+        });
+    });
+
+    return [...byMovie.values()].map((group) => ({
+        ...group,
+        sessions: [...group.sessions].sort((a, b) =>
+            `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`),
+        ),
+    }));
 };
 
 const languageLabel = (name: string) =>
@@ -164,11 +204,17 @@ const SessionResults = ({
         !options;
 
     const page = Number(parsed.page) || 1;
+    const selectedDate = typeof parsed.date === 'string' ? parsed.date : null;
+    const dates = selectedDate ? [selectedDate] : nextSevenDays();
+    const hasFilters =
+        venueIds.length > 0 ||
+        formatIds.length > 0 ||
+        languageIds.length > 0 ||
+        asList(parsed.time).length > 0 ||
+        selectedDate != null;
 
-    const query: SessionsQuery = {
-        date: typeof parsed.date === 'string' ? parsed.date : todayKey(),
+    const query: Omit<SessionsQuery, 'date' | 'page'> = {
         sort: typeof parsed.sort === 'string' ? parsed.sort : 'time_asc',
-        page,
         venues:
             options?.venues
                 .filter((venue) => venueIds.includes(venue.id))
@@ -184,15 +230,78 @@ const SessionResults = ({
         bands: asList(parsed.time),
     };
 
-    const { data, isLoading } = useSessions(query);
-    const groups = waitingForOptions ? [] : (data?.data ?? []);
-    const total = data?.meta.totalSessions ?? 0;
-    const isEmpty = !isLoading && !waitingForOptions && groups.length === 0;
-    const lastPage = data?.meta.lastPage ?? 1;
+    const firstPages = useQueries({
+        queries: dates.map((date) => ({
+            queryKey: [
+                'sessions',
+                { ...query, date, page: selectedDate ? page : 1 },
+            ],
+            queryFn: () =>
+                getSessions({
+                    ...query,
+                    date,
+                    page: selectedDate ? page : 1,
+                }),
+            enabled: !waitingForOptions,
+        })),
+    });
 
+    const morePages = selectedDate
+        ? []
+        : dates.flatMap((date, index) => {
+              const last = firstPages[index]?.data?.meta.lastPage ?? 1;
+              return Array.from(
+                  { length: Math.max(0, last - 1) },
+                  (_, item) => ({
+                      date,
+                      page: item + 2,
+                  }),
+              );
+          });
+
+    const restPages = useQueries({
+        queries: morePages.map(({ date, page: dayPage }) => ({
+            queryKey: ['sessions', { ...query, date, page: dayPage }],
+            queryFn: () => getSessions({ ...query, date, page: dayPage }),
+            enabled:
+                !waitingForOptions &&
+                firstPages.every(
+                    (result) => result.isSuccess || result.isError,
+                ),
+        })),
+    });
+
+    const isLoading =
+        firstPages.some((result) => result.isLoading) ||
+        restPages.some((result) => result.isLoading);
+    const bookable = (
+        waitingForOptions
+            ? []
+            : mergeGroups([
+                  ...firstPages.map((result) => result.data?.data ?? []),
+                  ...restPages.map((result) => result.data?.data ?? []),
+              ])
+    )
+        .map((group) => ({
+            ...group,
+            sessions: group.sessions.filter((session) =>
+                stillBookable(session.date, session.time),
+            ),
+        }))
+        .filter((group) => group.sessions.length > 0);
+    const groups = selectedDate
+        ? bookable
+        : bookable.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const total = selectedDate
+        ? (firstPages[0]?.data?.meta.totalSessions ?? 0)
+        : bookable.reduce((sum, group) => sum + group.sessions.length, 0);
+    const isEmpty = !isLoading && !waitingForOptions && bookable.length === 0;
+    const lastPage = selectedDate
+        ? (firstPages[0]?.data?.meta.lastPage ?? 1)
+        : Math.ceil(bookable.length / PAGE_SIZE);
     useEffect(() => {
-        onLastPage(lastPage);
-    }, [lastPage, onLastPage]);
+        onLastPage(isEmpty ? 0 : lastPage);
+    }, [isEmpty, lastPage, onLastPage]);
 
     return (
         <div className="flex min-w-0 flex-col px-7">
@@ -208,7 +317,9 @@ const SessionResults = ({
             {isEmpty ? (
                 <div className="mt-6 flex flex-1 items-center justify-center py-20">
                     <p className="text-h3 text-helper-red font-semibold">
-                        No Results for this Search
+                        {hasFilters
+                            ? 'No Results for this Search'
+                            : 'No sessions in the next seven days'}{' '}
                     </p>
                 </div>
             ) : (

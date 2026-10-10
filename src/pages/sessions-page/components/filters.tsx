@@ -96,7 +96,7 @@ const Filters = () => {
     const navigate = useNavigate();
     const filters = readFilters(location.search);
     const dates = nextSevenDays();
-    const [keepDefaultDate, setKeepDefaultDate] = useState(true);
+    const [keepDefaultDate, setKeepDefaultDate] = useState(false);
     const selectedDate =
         filters.selectedDate ?? (keepDefaultDate ? dates[0] : null);
     const dateRowRef = useRef<HTMLDivElement>(null);

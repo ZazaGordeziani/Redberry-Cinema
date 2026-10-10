@@ -14,7 +14,8 @@ type MovieSessionsProps = {
 
 const dayNumberOf = (dateStr: string) =>
     new Date(`${dateStr}T00:00:00`).getDate();
-
+const stillBookable = (date: string, time: string) =>
+    Date.now() <= new Date(`${date}T${time}:00`).getTime() + 10 * 60 * 1000;
 const SessionTicket = ({
     session,
     movieTitle,
@@ -125,16 +126,19 @@ const MovieSessions = ({
         new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
             weekday: 'short',
         });
-    const visibleVenues = venues.filter((group) => group.sessions.length > 0);
+    const bookableVenues = venues
+        .map((group) => ({
+            ...group,
+            sessions: group.sessions.filter((session) =>
+                stillBookable(session.date, session.time),
+            ),
+        }))
+        .filter((group) => group.sessions.length > 0);
 
-    const sessionCount = venues.reduce((total, group) => {
-        return (
-            total +
-            group.sessions.filter((session) =>
-                upcomingDates.includes(session.date),
-            ).length
-        );
-    }, 0);
+    const sessionCount = bookableVenues.reduce(
+        (total, group) => total + group.sessions.length,
+        0,
+    );
 
     return (
         <div className="flex w-3/4 flex-col">
@@ -175,12 +179,12 @@ const MovieSessions = ({
                             speedMultiplier={0.6}
                         />
                     </div>
-                ) : visibleVenues.length === 0 ? (
+                ) : bookableVenues.length === 0 ? (
                     <p className="text-helper-red text-[32px] font-extrabold">
                         NO AVAILABLE SESSIONS
                     </p>
                 ) : (
-                    visibleVenues.map((group) => {
+                    bookableVenues.map((group) => {
                         const halls = group.sessions.reduce<
                             Record<string, MovieSession[]>
                         >((grouped, session) => {

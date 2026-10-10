@@ -14,6 +14,9 @@ export type Order = {
     status: string;
     totalPrice: number;
     paidAt: string;
+    refundedAt: string | null;
+    isUpcoming: boolean;
+    isRefundable: boolean;
     cardLastFour: string;
     contact: {
         fullName: string;
@@ -21,11 +24,20 @@ export type Order = {
         mobileNumber: string;
     };
     session: {
+        id: number;
+        startsAt: string;
         date: string;
         time: string;
         hall: { id: number; name: string };
         venue: { id: number; name: string };
-        movie: { title: string; posterUrl: string };
+        format: { id: number; name: string };
+        language: { id: number; name: string };
+        movie: {
+            title: string;
+            runtimeMinutes: number;
+            posterUrl: string;
+            ageRating: { minAge: number };
+        };
     };
     tickets: {
         id: number;

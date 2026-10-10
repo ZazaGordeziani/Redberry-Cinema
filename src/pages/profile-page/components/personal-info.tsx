@@ -195,7 +195,10 @@ const PersonalInformation = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-6 pl-15"
+        >
             {renderField({
                 name: 'fullName',
                 label: 'Full name',

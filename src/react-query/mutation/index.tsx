@@ -6,9 +6,14 @@ import type {
     UpdateProfilePayload,
 } from '@/api/auth/index.types';
 import { toggleMovieNotify } from '@/api/movies';
+import { refundOrder } from '@/api/order';
 import type { LoginFormValues } from '@/components/authorization/modals/login/components/index.types';
 import type { RegisterFormValues } from '@/components/authorization/modals/register/components/index.types';
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+import {
+    useMutation,
+    useQueryClient,
+    type UseMutationOptions,
+} from '@tanstack/react-query';
 
 import type { AxiosError } from 'axios';
 
@@ -64,3 +69,12 @@ export const useToggleMovieNotify = (
         mutationFn: toggleMovieNotify,
         ...options,
     });
+export const useRefundOrder = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: refundOrder,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tickets'] });
+        },
+    });
+};

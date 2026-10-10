@@ -36,25 +36,25 @@ const SessionSort = () => {
     };
 
     return (
-        <div className="relative">
+        <div className="relative flex">
             <button
                 type="button"
                 onClick={() => setOpen((value) => !value)}
-                className="flex cursor-pointer items-center gap-2"
+                className="flex w-57.5 cursor-pointer items-center justify-between gap-2"
             >
-                <span className="text-body-m font-regular text-light-grey-muted">
+                <span className="text-body-m font-regular text-light-grey-muted shrink-0">
                     Sort:
                 </span>
-                <span className="text-label-m font-extrabold text-white">
+                <span className="text-label-m shrink-0 font-extrabold text-white">
                     {current.label}
                 </span>
-                <span className={open ? 'rotate-180' : ''}>
+                <span className={open ? 'shrink-0 rotate-180' : ''}>
                     <DropDownArrow />
                 </span>
             </button>
 
             {open && (
-                <div className="bg-background border-background-tertiary absolute top-full left-0 z-20 mt-2 flex w-full flex-col gap-3.75 rounded-xl border px-4 py-4">
+                <div className="bg-background border-background-tertiary absolute top-full left-0 z-20 mt-2 flex w-57.5 flex-col gap-3.75 rounded-xl border px-4 py-4">
                     {SORT_OPTIONS.map((option) => (
                         <button
                             key={option.id}

@@ -10,6 +10,7 @@ import {
     searchMovies,
     type SessionsQuery,
 } from '@/api/movies';
+import { getTickets } from '@/api/order';
 import { getCatalogueFilterOptions, getFilterOptions } from '@/api/venues';
 import { userAtom } from '@/store/auth';
 import { useQuery } from '@tanstack/react-query';
@@ -79,3 +80,11 @@ export const useSeatMap = (sessionId: number | null) =>
         enabled: sessionId != null,
         refetchInterval: 15000,
     });
+export const useTickets = () => {
+    const user = useAtomValue(userAtom);
+    return useQuery({
+        queryKey: ['tickets'],
+        queryFn: getTickets,
+        enabled: !!user?.token,
+    });
+};
