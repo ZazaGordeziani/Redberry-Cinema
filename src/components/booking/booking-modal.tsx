@@ -16,7 +16,8 @@ import qs from 'qs';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { AxiosError } from 'axios';
-
+import CheckoutForm from '@/components/booking/checkout-form';
+import CheckoutSummary from '@/components/booking/checkout-summary';
 type HoldError = { message?: string; contested?: string[] };
 
 const RATIO: Record<TicketType, number> = {
@@ -63,10 +64,14 @@ const BookingModal = () => {
     >({});
     const [deadline, setDeadline] = useState<number | null>(null);
     const [now, setNow] = useState(() => Date.now());
-    const [step, setStep] = useState<'seats' | 'checkout'>('seats');
+    const [step, setStep] = useState<'seats' | 'checkout'>(
+        parsed.step === 'checkout' ? 'checkout' : 'seats',
+    );
     const [notice, setNotice] = useState<string | null>(null);
     const [dialog, setDialog] = useState<string | null>(null);
     const [forcedSold, setForcedSold] = useState<string[]>([]);
+    const [canPay, setCanPay] = useState(false);
+
     const seeded = useRef<number | null>(null);
     const requestId = useRef(0);
     const holdId = useRef<string | null>(null);
@@ -77,6 +82,8 @@ const BookingModal = () => {
         if (id) releaseHold(id);
         const next = qs.parse(location.search, { ignoreQueryPrefix: true });
         delete next.booking;
+        delete next.step;
+
         navigate(
             {
                 pathname: location.pathname,
@@ -88,12 +95,29 @@ const BookingModal = () => {
             { replace: true, state: null },
         );
     };
+    const chooseStep = (nextStep: 'seats' | 'checkout') => {
+        const next = qs.parse(location.search, { ignoreQueryPrefix: true });
+        if (nextStep === 'checkout') next.step = 'checkout';
+        else delete next.step;
+        setStep(nextStep);
+        navigate(
+            {
+                pathname: location.pathname,
+                search: qs.stringify(next, {
+                    arrayFormat: 'repeat',
+                    skipNulls: true,
+                }),
+            },
+            { state: location.state },
+        );
+    };
 
     useEffect(() => {
         setSelected([]);
         setPriced({});
         setDeadline(null);
-        setStep('seats');
+        const query = qs.parse(location.search, { ignoreQueryPrefix: true });
+        setStep(query.step === 'checkout' ? 'checkout' : 'seats');
         setNotice(null);
         setDialog(null);
         setForcedSold([]);
@@ -212,7 +236,7 @@ const BookingModal = () => {
         setSelected([]);
         setDeadline(null);
         setPriced({});
-        setStep('seats');
+        chooseStep('seats');
         setDialog('Your hold time expired. Please re-select your seats.');
         refetch();
     }, [remaining, deadline, refetch]);
@@ -290,7 +314,9 @@ const BookingModal = () => {
             onClick={close}
         >
             <section
-                className="bg-background flex max-h-[90vh] max-w-[95vw] flex-col gap-8 overflow-auto rounded-[28px] p-8"
+                className={`bg-background flex max-h-[90vh] max-w-[95vw] flex-col gap-8 overflow-auto rounded-[28px] p-8 ${
+                    step === 'checkout' ? 'pb-18' : ''
+                }`}
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="flex h-14.5 shrink-0 items-start justify-between gap-6">
@@ -328,29 +354,55 @@ const BookingModal = () => {
                 </div>
 
                 <div className="flex gap-8">
-                    <SeatSelection
-                        step={step}
-                        onStepChange={setStep}
-                        map={map}
-                        isLoading={isMapLoading}
-                        selected={selected}
-                        forcedSold={forcedSold}
-                        onToggleSeat={toggleSeat}
-                    />
+                    {step === 'seats' ? (
+                        <SeatSelection
+                            step={step}
+                            onStepChange={chooseStep}
+                            map={map}
+                            isLoading={isMapLoading}
+                            selected={selected}
+                            forcedSold={forcedSold}
+                            onToggleSeat={toggleSeat}
+                        />
+                    ) : (
+                        <CheckoutForm
+                            step={step}
+                            onStepChange={chooseStep}
+                            fullName={me.fullName ?? ''}
+                            email={me.email ?? ''}
+                            mobileNumber={me.mobileNumber ?? ''}
+                            onValidChange={setCanPay}
+                        />
+                    )}
                     <div className="bg-background-secondary w-px self-stretch" />
-                    <YourSeats
-                        selected={selected}
-                        priceOf={priceOf}
-                        onRemove={(seatId) =>
-                            setSelected((current) =>
-                                current.filter(
-                                    (item) => item.seatId !== seatId,
-                                ),
-                            )
-                        }
-                        onChooseType={chooseType}
-                        onCheckout={() => setStep('checkout')}
-                    />
+                    {step === 'seats' ? (
+                        <YourSeats
+                            selected={selected}
+                            priceOf={priceOf}
+                            onRemove={(seatId) =>
+                                setSelected((current) =>
+                                    current.filter(
+                                        (item) => item.seatId !== seatId,
+                                    ),
+                                )
+                            }
+                            onChooseType={chooseType}
+                            onCheckout={() => chooseStep('checkout')}
+                        />
+                    ) : (
+                        <CheckoutSummary
+                            movieTitle={summary?.movieTitle ?? 'Session'}
+                            hallName={summary?.hallName ?? ''}
+                            date={summary?.date ?? ''}
+                            time={summary?.time ?? ''}
+                            selected={selected}
+                            subtotal={selected.reduce(
+                                (sum, seat) => sum + priceOf(seat),
+                                0,
+                            )}
+                            canPay={canPay}
+                        />
+                    )}
                 </div>
             </section>
 
