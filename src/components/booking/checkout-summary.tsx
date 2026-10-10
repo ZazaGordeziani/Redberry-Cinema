@@ -72,33 +72,38 @@ const CheckoutSummary = ({
     return (
         <div className="flex w-85 flex-col">
             <h3 className="text-label-m font-extrabold text-white">Summary</h3>
-            {selected.length > 0 && (
-                <div className="bg-background-secondary mt-3 flex flex-col gap-2.5 rounded-2xl p-4">
-                    <p className="text-label-m font-extrabold text-white">
-                        {movieTitle}
-                    </p>
-                    <p className="text-body-s font-regular text-light-grey-muted">
-                        {`Hall ${hallName} · ${shortDate(date)} · ${time}`}
-                    </p>
-                    <div className="bg-background-tertiary h-px" />
-                    <div className="flex items-center justify-between">
-                        <span className="text-body-s font-regular text-light-grey-muted">
-                            Seats
-                        </span>
-                        <span className="text-body-s font-semibold text-white">
-                            {selected.map((seat) => seat.code).join(', ')}
-                        </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <span className="text-body-s font-regular text-light-grey-muted">
-                            Tickets
-                        </span>
-                        <span className="text-body-s font-semibold text-white">
-                            {tickets}
-                        </span>
-                    </div>
+            <div
+                className={`bg-background-secondary mt-3 flex flex-col gap-2.5 rounded-2xl p-4 ${
+                    selected.length === 0 ? 'invisible' : ''
+                }`}
+            >
+                <p className="text-label-m font-extrabold text-white">
+                    {movieTitle}
+                </p>
+                <p className="text-body-s font-regular text-light-grey-muted">
+                    {`Hall ${hallName} · ${shortDate(date)} · ${time}`}
+                </p>
+                <div className="bg-background-tertiary h-px" />
+                <div className="flex items-center justify-between">
+                    <span className="text-body-s font-regular text-light-grey-muted">
+                        Seats
+                    </span>
+                    <span className="text-body-s font-semibold text-white">
+                        {selected.length > 0
+                            ? selected.map((seat) => seat.code).join(', ')
+                            : '\u00A0'}
+                    </span>
                 </div>
-            )}
+                <div className="flex items-center justify-between">
+                    <span className="text-body-s font-regular text-light-grey-muted">
+                        Tickets
+                    </span>
+                    <span className="text-body-s font-semibold text-white">
+                        {tickets || '\u00A0'}
+                    </span>
+                </div>
+            </div>
+
             <div className="mt-55 pt-8">
                 <div className="flex items-center justify-between">
                     <span className="text-label-s font-semibold text-white">

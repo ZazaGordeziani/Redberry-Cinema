@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DropDownArrow from '@/assets/drop-down-arrow';
 import ProfileIncomplete from '@/assets/profile-incomplete';
 import ProfileComplete from '@/assets/profile-complete';
@@ -11,7 +11,17 @@ const UserProfile = () => {
     const user = useAtomValue(userAtom);
     const { data: me, isLoading } = useMe();
     const [open, setOpen] = useState(false);
-
+    const rootRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (!open) return;
+        const onPointerDown = (event: MouseEvent) => {
+            if (!rootRef.current?.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', onPointerDown);
+        return () => document.removeEventListener('mousedown', onPointerDown);
+    }, [open]);
     if (!user?.token) return null;
     if (isLoading || !me) return null;
 
@@ -32,7 +42,7 @@ const UserProfile = () => {
     }
 
     return (
-        <div className="relative">
+        <div ref={rootRef} className="relative">
             <div className="flex flex-row items-center gap-6">
                 <div className="flex flex-row items-center gap-3 font-semibold text-white">
                     <div className="bg-background-secondary relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg">

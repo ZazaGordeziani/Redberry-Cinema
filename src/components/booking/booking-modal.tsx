@@ -390,11 +390,9 @@ const BookingModal = () => {
             <CongratulationModal
                 order={order}
                 onTickets={() => {
-                    setOrder(null);
                     navigate('/profile?tab=tickets');
                 }}
                 onHome={() => {
-                    setOrder(null);
                     navigate('/');
                 }}
             />

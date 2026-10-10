@@ -46,7 +46,7 @@ const ComingSoon = () => {
     if (isLoading) return null;
 
     return (
-        <section className="mt-10 flex w-full flex-col gap-6 px-15">
+        <section className="mt-10 flex w-full flex-col gap-6 px-15 pb-15">
             <div className="flex items-center justify-between">
                 <h2 className="text-h1 font-extrabold text-white">
                     COMING SOON

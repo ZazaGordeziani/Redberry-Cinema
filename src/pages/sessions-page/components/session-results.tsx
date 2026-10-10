@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SessionSort from '@/pages/sessions-page/components/session-sort';
 import { useOpenSession } from '@/components/booking/open-session';
+import { BounceLoader } from 'react-spinners';
 
 const asList = (value: unknown) => {
     if (Array.isArray(value)) return value.map(String);
@@ -204,7 +205,8 @@ const SessionResults = ({
         !options;
 
     const page = Number(parsed.page) || 1;
-    const selectedDate = typeof parsed.date === 'string' ? parsed.date : null;
+    const selectedDate =
+        typeof parsed.date === 'string' ? parsed.date : nextSevenDays()[0];
     const dates = selectedDate ? [selectedDate] : nextSevenDays();
     const hasFilters =
         venueIds.length > 0 ||
@@ -300,6 +302,8 @@ const SessionResults = ({
         ? (firstPages[0]?.data?.meta.lastPage ?? 1)
         : Math.ceil(bookable.length / PAGE_SIZE);
     useEffect(() => {
+        if (isLoading) return;
+
         onLastPage(isEmpty ? 0 : lastPage);
     }, [isEmpty, lastPage, onLastPage]);
 
@@ -307,23 +311,33 @@ const SessionResults = ({
         <div className="flex min-w-0 flex-col px-7">
             <div className="flex items-center justify-between">
                 <p className="text-label-m font-semibold text-white">
-                    {isEmpty
-                        ? 'No sessions found'
-                        : `Showing ${total} sessions`}
+                    {isLoading
+                        ? ''
+                        : isEmpty
+                          ? 'No sessions found'
+                          : `Showing ${total} sessions`}
                 </p>
                 <SessionSort />
             </div>
 
-            {isEmpty ? (
+            {isLoading ? (
+                <div className="flex min-h-[70vh] w-full items-center justify-center">
+                    <BounceLoader
+                        color="#EC3013"
+                        size={84}
+                        speedMultiplier={0.6}
+                    />
+                </div>
+            ) : isEmpty ? (
                 <div className="mt-6 flex flex-1 items-center justify-center py-20">
                     <p className="text-h3 text-helper-red font-semibold">
                         {hasFilters
                             ? 'No Results for this Search'
-                            : 'No sessions in the next seven days'}{' '}
+                            : 'No sessions in the next seven days'}
                     </p>
                 </div>
             ) : (
-                <div className="[&::-webkit-scrollbar-thumb]:bg-helper-red mt-6 ml-3 max-h-screen scrollbar-thin [scrollbar-color:#EC3013_transparent] overflow-y-auto [&::-webkit-scrollbar]:w-0.75 [&::-webkit-scrollbar-thumb]:border-l-[5px] [&::-webkit-scrollbar-track]:bg-transparent">
+                <div className="[&::-webkit-scrollbar-thumb]:bg-helper-red mt-6 ml-3 h-screen scrollbar-thin [scrollbar-color:#EC3013_transparent] overflow-y-auto [&::-webkit-scrollbar]:w-0.75 [&::-webkit-scrollbar-thumb]:border-l-[5px] [&::-webkit-scrollbar-track]:bg-transparent">
                     {groups.map((group, index) => (
                         <div key={group.movie.id}>
                             <MovieRow

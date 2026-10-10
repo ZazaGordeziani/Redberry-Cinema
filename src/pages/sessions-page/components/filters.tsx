@@ -96,10 +96,11 @@ const Filters = () => {
     const navigate = useNavigate();
     const filters = readFilters(location.search);
     const dates = nextSevenDays();
-    const [keepDefaultDate, setKeepDefaultDate] = useState(false);
+    const [keepDefaultDate, setKeepDefaultDate] = useState(true);
     const selectedDate =
         filters.selectedDate ?? (keepDefaultDate ? dates[0] : null);
     const dateRowRef = useRef<HTMLDivElement>(null);
+    const clearedRef = useRef(false);
 
     const visibleFormats =
         filters.venueIds.length === 0
@@ -128,6 +129,15 @@ const Filters = () => {
 
         navigate({ pathname: location.pathname, search });
     };
+
+    useEffect(() => {
+        if (clearedRef.current || filters.selectedDate) return;
+
+        writeFilters({
+            ...filters,
+            selectedDate: dates[0],
+        });
+    }, []);
 
     useEffect(() => {
         const row = dateRowRef.current;
@@ -169,6 +179,7 @@ const Filters = () => {
         (selectedDate ? 1 : 0);
 
     const clearFilters = () => {
+        clearedRef.current = true;
         setKeepDefaultDate(false);
         writeFilters({
             venueIds: [],

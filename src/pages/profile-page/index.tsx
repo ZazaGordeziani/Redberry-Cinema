@@ -62,6 +62,7 @@ const ProfilePage = () => {
                     )}
                 </button>
             </div>
+            <div className="bg-background-secondary mx-15 h-px w-full" />
 
             <div
                 className={
