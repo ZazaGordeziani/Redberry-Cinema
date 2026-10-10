@@ -93,12 +93,12 @@ const YourSeats = ({
                 </div>
             )}
 
-            <div className="mt-auto pt-8">
+            <div className="mt-auto">
                 <div className="flex items-center justify-between">
                     <span className="text-label-s font-semibold text-white">
                         SUBTOTAL
                     </span>
-                    <span className="text-label-s font-semibold text-white">
+                    <span className="text-h1 font-semibold text-white">
                         ₾{money(subtotal)}
                     </span>
                 </div>

@@ -1,11 +1,16 @@
 import PersonalInformation from '@/pages/profile-page/components/personal-info';
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 type Tab = 'personal' | 'tickets';
 
 const ProfilePage = () => {
-    const [activeTab, setActiveTab] = useState<Tab>('personal');
-
+    const location = useLocation();
+    const openedOnTickets =
+        (location.state as { tab?: Tab } | null)?.tab === 'tickets';
+    const [activeTab, setActiveTab] = useState<Tab>(
+        openedOnTickets ? 'tickets' : 'personal',
+    );
     return (
         <div className="w-full self-start pt-1.75 pl-12.75">
             <h1 className="text-h1 font-extrabold text-white">My Profile</h1>

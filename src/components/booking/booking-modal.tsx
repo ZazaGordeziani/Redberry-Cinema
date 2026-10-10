@@ -13,12 +13,21 @@ import { userAtom } from '@/store/auth';
 import CloseSign from '@/assets/close-sign';
 import { useAtomValue } from 'jotai';
 import qs from 'qs';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { AxiosError } from 'axios';
 import CheckoutForm from '@/components/booking/checkout-form';
 import CheckoutSummary from '@/components/booking/checkout-summary';
+import type { CheckoutDraft } from '@/components/booking/checkout-form';
+import CongratulationModal from '@/components/booking/congratulation-modal';
+import { createOrder } from '@/api/order';
+import type { Order } from '@/api/order/index.types';
 type HoldError = { message?: string; contested?: string[] };
+type OrderError = {
+    message?: string;
+    contested?: string[];
+    errors?: Record<string, string[]>;
+};
 
 const RATIO: Record<TicketType, number> = {
     adult: 1,
@@ -71,7 +80,16 @@ const BookingModal = () => {
     const [dialog, setDialog] = useState<string | null>(null);
     const [forcedSold, setForcedSold] = useState<string[]>([]);
     const [canPay, setCanPay] = useState(false);
-
+    const [draft, setDraft] = useState<CheckoutDraft | null>(null);
+    const [serverErrors, setServerErrors] = useState<Record<string, string>>(
+        {},
+    );
+    const [isPaying, setIsPaying] = useState(false);
+    const [order, setOrder] = useState<Order | null>(null);
+    const updateDraft = useCallback((next: CheckoutDraft | null) => {
+        setDraft(next);
+        setServerErrors({});
+    }, []);
     const seeded = useRef<number | null>(null);
     const requestId = useRef(0);
     const holdId = useRef<string | null>(null);
@@ -290,6 +308,98 @@ const BookingModal = () => {
             { seatId: seat.id, code: seat.code, ticketType: 'adult' },
         ]);
     };
+    const placeOrder = async () => {
+        if (!draft || !holdId.current || isPaying) return;
+        setIsPaying(true);
+        setServerErrors({});
+
+        try {
+            const created = await createOrder({
+                holdId: holdId.current,
+                ...draft,
+            });
+            holdId.current = null;
+            setOrder(created);
+        } catch (error) {
+            const response = (error as AxiosError<OrderError>).response;
+            const status = response?.status;
+            const body = response?.data;
+
+            if (status === 422 && body?.errors) {
+                setServerErrors(
+                    Object.fromEntries(
+                        Object.entries(body.errors).map(([key, messages]) => [
+                            key,
+                            messages[0],
+                        ]),
+                    ),
+                );
+                return;
+            }
+
+            if (status === 422 && body?.message) {
+                if (
+                    body.message ===
+                    'Your hold time expired. Please select seats again.'
+                ) {
+                    holdId.current = null;
+                    setSelected([]);
+                    setDeadline(null);
+                    setPriced({});
+                    chooseStep('seats');
+                    setNotice(body.message);
+                    refetch();
+                    return;
+                }
+                setDialog(body.message);
+                return;
+            }
+
+            if (status === 409) {
+                const contested = body?.contested ?? [];
+                setForcedSold(contested);
+                setSelected((current) =>
+                    current.filter((seat) => !contested.includes(seat.code)),
+                );
+                setNotice(
+                    body?.message ?? 'Some of those seats were just taken.',
+                );
+                chooseStep('seats');
+                refetch();
+                return;
+            }
+
+            if (status === 401) {
+                navigate(
+                    { pathname: location.pathname, search: location.search },
+                    { state: { ...(location.state as object), login: true } },
+                );
+                return;
+            }
+
+            if (status === 403 && body?.message) {
+                setDialog(body.message);
+            }
+        } finally {
+            setIsPaying(false);
+        }
+    };
+
+    if (order) {
+        return (
+            <CongratulationModal
+                order={order}
+                onTickets={() => {
+                    setOrder(null);
+                    navigate('/profile', { state: { tab: 'tickets' } });
+                }}
+                onHome={() => {
+                    setOrder(null);
+                    navigate('/');
+                }}
+            />
+        );
+    }
 
     if (!sessionId || !user?.token || isMeLoading || !me) return null;
 
@@ -314,9 +424,7 @@ const BookingModal = () => {
             onClick={close}
         >
             <section
-                className={`bg-background flex max-h-[90vh] max-w-[95vw] flex-col gap-8 overflow-auto rounded-[28px] p-8 ${
-                    step === 'checkout' ? 'pb-18' : ''
-                }`}
+                className={`bg-background flex max-h-[90vh] max-w-[95vw] flex-col gap-8 overflow-auto rounded-[28px] p-8`}
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="flex h-14.5 shrink-0 items-start justify-between gap-6">
@@ -372,6 +480,8 @@ const BookingModal = () => {
                             email={me.email ?? ''}
                             mobileNumber={me.mobileNumber ?? ''}
                             onValidChange={setCanPay}
+                            serverErrors={serverErrors}
+                            onDraftChange={updateDraft}
                         />
                     )}
                     <div className="bg-background-secondary w-px self-stretch" />
@@ -401,6 +511,8 @@ const BookingModal = () => {
                                 0,
                             )}
                             canPay={canPay}
+                            isPaying={isPaying}
+                            onPay={placeOrder}
                         />
                     )}
                 </div>

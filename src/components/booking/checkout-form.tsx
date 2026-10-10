@@ -2,8 +2,6 @@ import CheckMark from '@/assets/check-mark';
 import ExclamationMark from '@/assets/exclamation-mark';
 import { useEffect, useState } from 'react';
 
-const DAYS_IN_MONTH = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
 const formatExpiry = (raw: string) => {
     const digits = raw.replace(/\D/g, '').slice(0, 4);
     if (digits.length <= 2) return digits;
@@ -12,12 +10,7 @@ const formatExpiry = (raw: string) => {
 
 const expiryAllowed = (value: string) => {
     if (!/^\d{0,2}(\/\d{0,2})?$/.test(value)) return false;
-    const [dayText, monthText = ''] = value.split('/');
-
-    if (dayText.length === 2) {
-        const day = Number(dayText);
-        if (day < 1 || day > 31) return false;
-    }
+    const [monthText] = value.split('/');
 
     if (monthText.length === 1 && monthText !== '0' && monthText !== '1') {
         return false;
@@ -26,9 +19,6 @@ const expiryAllowed = (value: string) => {
     if (monthText.length === 2) {
         const month = Number(monthText);
         if (month < 1 || month > 12) return false;
-        if (dayText.length === 2 && Number(dayText) > DAYS_IN_MONTH[month]) {
-            return false;
-        }
     }
 
     return true;
@@ -41,6 +31,16 @@ type CheckoutFormProps = {
     email: string;
     mobileNumber: string;
     onValidChange: (valid: boolean) => void;
+    serverErrors: Record<string, string>;
+    onDraftChange: (draft: CheckoutDraft | null) => void;
+};
+export type CheckoutDraft = {
+    fullName: string;
+    email: string;
+    mobileNumber: string;
+    cardNumber: string;
+    expiry: string;
+    cvv: string;
 };
 const formatCard = (raw: string) => {
     const digits = raw.replace(/\D/g, '').slice(0, 16);
@@ -53,6 +53,8 @@ const CheckoutForm = ({
     email: initialEmail,
     mobileNumber: initialMobile,
     onValidChange,
+    serverErrors,
+    onDraftChange,
 }: CheckoutFormProps) => {
     const [fullName, setFullName] = useState(initialName);
     const [email, setEmail] = useState(initialEmail);
@@ -103,7 +105,29 @@ const CheckoutForm = ({
 
     useEffect(() => {
         onValidChange(canPay);
-    }, [canPay, onValidChange]);
+        onDraftChange(
+            canPay
+                ? {
+                      fullName: fullName.trim(),
+                      email: email.trim(),
+                      mobileNumber: mobile.trim(),
+                      cardNumber: card,
+                      expiry,
+                      cvv,
+                  }
+                : null,
+        );
+    }, [
+        canPay,
+        fullName,
+        email,
+        mobile,
+        card,
+        expiry,
+        cvv,
+        onValidChange,
+        onDraftChange,
+    ]);
 
     return (
         <div className="flex w-180 shrink-0 flex-col">
@@ -126,7 +150,10 @@ const CheckoutForm = ({
                 <Field
                     label="Full name"
                     value={fullName}
-                    error={touched.fullName ? nameError : null}
+                    error={
+                        serverErrors.fullName ??
+                        (touched.fullName ? nameError : null)
+                    }
                     valid={!nameError}
                     onChange={setFullName}
                     onBlur={() =>
@@ -187,8 +214,11 @@ const CheckoutForm = ({
                     <Field
                         label="Expiry"
                         value={expiry}
-                        error={touched.expiry ? expiryError : null}
-                        valid={!expiryError}
+                        error={
+                            serverErrors.expiry ??
+                            (touched.expiry ? expiryError : null)
+                        }
+                        valid={!expiryError && !serverErrors.expiry}
                         inputMode="numeric"
                         onChange={(value) => {
                             const next = formatExpiry(value);

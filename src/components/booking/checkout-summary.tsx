@@ -41,6 +41,8 @@ type CheckoutSummaryProps = {
     selected: SelectedSeat[];
     subtotal: number;
     canPay: boolean;
+    isPaying: boolean;
+    onPay: () => void;
 };
 
 const CheckoutSummary = ({
@@ -51,6 +53,8 @@ const CheckoutSummary = ({
     selected,
     subtotal,
     canPay,
+    isPaying,
+    onPay,
 }: CheckoutSummaryProps) => {
     const counts = selected.reduce<Partial<Record<TicketType, number>>>(
         (accumulator, seat) => {
@@ -95,20 +99,21 @@ const CheckoutSummary = ({
                     </div>
                 </div>
             )}
-            <div className="mt-auto pt-8">
+            <div className="mt-55 pt-8">
                 <div className="flex items-center justify-between">
                     <span className="text-label-s font-semibold text-white">
                         SUBTOTAL
                     </span>
-                    <span className="text-label-s font-semibold text-white">
+                    <span className="text-h1 font-semibold text-white">
                         ₾{money(subtotal)}
                     </span>
                 </div>
                 <button
                     type="button"
-                    disabled={!canPay}
+                    disabled={!canPay || isPaying}
+                    onClick={onPay}
                     className={`text-label-m mt-4 w-full rounded-full px-5.5 py-3.25 font-extrabold ${
-                        canPay
+                        canPay && !isPaying
                             ? 'bg-helper-red cursor-pointer text-white'
                             : 'text-light-grey-muted bg-dark-grey'
                     }`}
