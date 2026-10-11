@@ -139,6 +139,7 @@ const Filters = () => {
         });
     }, []);
 
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         const row = dateRowRef.current;
         if (!row) return;

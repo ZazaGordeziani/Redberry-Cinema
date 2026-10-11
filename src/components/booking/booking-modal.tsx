@@ -134,17 +134,17 @@ const BookingModal = () => {
         [location.pathname, location.search, location.state, navigate],
     );
 
-    useEffect(() => {
-        setSelected([]);
-        setPriced({});
-        setDeadline(null);
-        const query = qs.parse(location.search, { ignoreQueryPrefix: true });
-        setStep(query.step === 'checkout' ? 'checkout' : 'seats');
-        setNotice(null);
-        setDialog(null);
-        setForcedSold([]);
-        seeded.current = null;
-    }, [sessionId]);
+    // useEffect(() => {
+    //     setSelected([]);
+    //     setPriced({});
+    //     setDeadline(null);
+    //     const query = qs.parse(location.search, { ignoreQueryPrefix: true });
+    //     setStep(query.step === 'checkout' ? 'checkout' : 'seats');
+    //     setNotice(null);
+    //     setDialog(null);
+    //     setForcedSold([]);
+    //     seeded.current = null;
+    // }, [sessionId]);
 
     useEffect(() => {
         if (!map || seeded.current === map.sessionId) return;
@@ -168,8 +168,8 @@ const BookingModal = () => {
 
         if (selected.length === 0) {
             const current = ++requestId.current;
-            setDeadline(null);
-            setPriced({});
+            // setDeadline(null);
+            // setPriced({});
             const id = holdId.current;
             if (!id) return;
             holdId.current = null;
@@ -242,26 +242,50 @@ const BookingModal = () => {
         return () => window.clearTimeout(timer);
     }, [selected, sessionId, canBook, refetch]);
 
+    // useEffect(() => {
+    //     if (!deadline) return;
+    //     setNow(Date.now());
+    //     const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    //     return () => window.clearInterval(timer);
+    // }, [deadline]);
+
+    // const remaining = deadline
+    //     ? Math.max(0, Math.round((deadline - now) / 1000))
+    //     : 0;
+
+    // useEffect(() => {
+    //     if (!deadline || remaining > 0) return;
+    //     setSelected([]);
+    //     setDeadline(null);
+    //     setPriced({});
+    //     chooseStep('seats');
+    //     setDialog('Your hold time expired. Please re-select your seats.');
+    //     refetch();
+    // }, [remaining, deadline, refetch, chooseStep]);
+
     useEffect(() => {
-        if (!deadline) return;
-        setNow(Date.now());
-        const timer = window.setInterval(() => setNow(Date.now()), 1000);
+        if (!deadline || selected.length === 0) return;
+
+        const timer = window.setInterval(() => {
+            const nextNow = Date.now();
+            setNow(nextNow);
+            if (nextNow < deadline) return;
+
+            setSelected([]);
+            setDeadline(null);
+            setPriced({});
+            chooseStep('seats');
+            setDialog('Your hold time expired. Please re-select your seats.');
+            refetch();
+        }, 1000);
+
         return () => window.clearInterval(timer);
-    }, [deadline]);
+    }, [deadline, selected.length, chooseStep, refetch]);
 
-    const remaining = deadline
-        ? Math.max(0, Math.round((deadline - now) / 1000))
-        : 0;
-
-    useEffect(() => {
-        if (!deadline || remaining > 0) return;
-        setSelected([]);
-        setDeadline(null);
-        setPriced({});
-        chooseStep('seats');
-        setDialog('Your hold time expired. Please re-select your seats.');
-        refetch();
-    }, [remaining, deadline, refetch, chooseStep]);
+    const remaining =
+        deadline && selected.length > 0
+            ? Math.max(0, Math.round((deadline - now) / 1000))
+            : 0;
     useEffect(() => {
         if (!order) return;
         const here = window.location.href;
@@ -531,7 +555,7 @@ const BookingModal = () => {
                                 (sum, seat) => sum + priceOf(seat),
                                 0,
                             )}
-                            canPay={canPay}
+                            canPay={canPay && selected.length > 0}
                             isPaying={isPaying}
                             onPay={placeOrder}
                         />

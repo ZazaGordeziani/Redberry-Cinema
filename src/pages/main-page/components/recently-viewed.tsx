@@ -1,18 +1,11 @@
 import HorizontalScroll from '@/components/base/horizontal-scroll/horizontal-scroll';
-import {
-    readRecentMovies,
-    type RecentMovie,
-} from '@/pages/main-page/components/recently-viewed-storage';
-import { useEffect, useState } from 'react';
+import { readRecentMovies } from '@/pages/main-page/components/recently-viewed-storage';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const RecentlyViewed = () => {
     const navigate = useNavigate();
-    const [movies, setMovies] = useState<RecentMovie[]>([]);
-
-    useEffect(() => {
-        setMovies(readRecentMovies());
-    }, []);
+    const [movies] = useState(readRecentMovies);
 
     if (movies.length === 0) return null;
 

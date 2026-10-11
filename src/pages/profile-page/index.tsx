@@ -2,6 +2,7 @@ import MyTickets from '@/pages/profile-page/components/my-tickets';
 import PersonalInformation from '@/pages/profile-page/components/personal-info';
 import { useTickets } from '@/react-query/query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
 
 type Tab = 'personal' | 'tickets';
 
@@ -10,15 +11,16 @@ const ProfilePage = () => {
     const [params] = useSearchParams();
     const activeTab: Tab =
         params.get('tab') === 'tickets' ? 'tickets' : 'personal';
+    const [now] = useState(() => Date.now());
+
     const { data: orders = [] } = useTickets();
     const upcomingCount = orders.filter((order) => {
         const start = new Date(
             `${order.session.date}T${order.session.time}:00`,
         ).getTime();
-        const refunded =
-            order.refundedAt != null &&
-            new Date(order.refundedAt).getTime() <= Date.now();
-        return start > Date.now() && !refunded;
+        const refunded = order.refundedAt != null;
+
+        return start > now && !refunded;
     }).length;
     const chooseTab = (tab: Tab) => {
         navigate(tab === 'tickets' ? '/profile?tab=tickets' : '/profile');

@@ -311,7 +311,7 @@ const SessionResults = ({
         if (isLoading) return;
 
         onLastPage(isEmpty ? 0 : lastPage);
-    }, [isEmpty, lastPage, onLastPage]);
+    }, [isEmpty, lastPage, onLastPage, isLoading]);
 
     return (
         <div className="flex min-w-0 flex-col px-7">

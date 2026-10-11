@@ -67,13 +67,12 @@ const MyTickets = () => {
     const [when, setWhen] = useState<'upcoming' | 'past'>('upcoming');
     const [dialog, setDialog] = useState<string | null>(null);
     const [refundingId, setRefundingId] = useState<string | null>(null);
+    const [now] = useState(() => Date.now());
 
     const sessionHasStarted = (order: Order) =>
-        sessionStart(order.session.date, order.session.time).getTime() <=
-        Date.now();
-    const wasRefunded = (order: Order) =>
-        order.refundedAt != null &&
-        new Date(order.refundedAt).getTime() <= Date.now();
+        sessionStart(order.session.date, order.session.time).getTime() <= now;
+    const wasRefunded = (order: Order) => order.refundedAt != null;
+
     const bySoonestSession = (a: Order, b: Order) =>
         sessionStart(a.session.date, a.session.time).getTime() -
         sessionStart(b.session.date, b.session.time).getTime();

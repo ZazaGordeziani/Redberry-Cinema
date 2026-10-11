@@ -114,12 +114,14 @@ const MovieSessions = ({
     availableDates,
 }: MovieSessionsProps) => {
     const { slug = '' } = useParams();
-    const today = new Date();
-    const todayKey = [
-        today.getFullYear(),
-        String(today.getMonth() + 1).padStart(2, '0'),
-        String(today.getDate()).padStart(2, '0'),
-    ].join('-');
+    const [todayKey] = useState(() => {
+        const today = new Date();
+        return [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, '0'),
+            String(today.getDate()).padStart(2, '0'),
+        ].join('-');
+    });
 
     const upcomingDates = availableDates
         .filter((date) => date >= todayKey)

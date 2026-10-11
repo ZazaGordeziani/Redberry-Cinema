@@ -30,7 +30,11 @@ const DefaultLayout = () => {
                             </div>
                         }
                     >
-                        <BookingModal />
+                        <BookingModal
+                            key={new URLSearchParams(location.search).get(
+                                'booking',
+                            )}
+                        />
                     </Suspense>
                 )}
                 <PageContainer>

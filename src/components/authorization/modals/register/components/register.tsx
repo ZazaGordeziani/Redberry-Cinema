@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useRegister } from '@/react-query/mutation';
 
@@ -34,7 +34,7 @@ export const Register = () => {
         reset,
         clearErrors,
         handleSubmit,
-        watch,
+
         formState: { isValid },
     } = useForm<RegisterFormValues>({
         resolver: zodResolver(SignUpFormSchema),
@@ -42,7 +42,8 @@ export const Register = () => {
         mode: 'onChange',
     });
 
-    const usernameValue = watch('username');
+    const usernameValue = useWatch({ control, name: 'username' });
+
     const firstLetter = usernameValue ? usernameValue[0].toUpperCase() : null;
 
     const { mutate: handleRegister } = useRegister({
