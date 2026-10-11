@@ -34,16 +34,31 @@ const shortDate = (date: string) => {
 };
 
 const sessionStart = (date: string, time: string) =>
-    new Date(`${date}T${time}:00`);
+    new Date(`${date}T${time}:00+04:00`);
+
+const georgiaParts = (value: Date) => {
+    const wall = new Date(value.getTime() + 4 * 60 * 60 * 1000);
+    return {
+        hours: String(wall.getUTCHours()).padStart(2, '0'),
+        minutes: String(wall.getUTCMinutes()).padStart(2, '0'),
+        weekday: WEEKDAYS[wall.getUTCDay()],
+        day: wall.getUTCDate(),
+        month: MONTHS[wall.getUTCMonth()],
+    };
+};
 
 const refundUntil = (date: string, time: string) => {
     const value = new Date(
         sessionStart(date, time).getTime() - 2 * 60 * 60 * 1000,
     );
     if (Number.isNaN(value.getTime())) return '';
-    const hours = String(value.getHours()).padStart(2, '0');
-    const minutes = String(value.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}, ${WEEKDAYS[value.getDay()]} ${value.getDate()} ${MONTHS[value.getMonth()]}`;
+    const parts = georgiaParts(value);
+    return `${parts.hours}:${parts.minutes}, ${parts.weekday} ${parts.day} ${parts.month}`;
+};
+
+const lessThanTwoHoursLeft = (date: string, time: string) => {
+    const left = sessionStart(date, time).getTime() - Date.now();
+    return left > 0 && left < 2 * 60 * 60 * 1000;
 };
 
 const MyTickets = () => {
@@ -59,12 +74,15 @@ const MyTickets = () => {
     const wasRefunded = (order: Order) =>
         order.refundedAt != null &&
         new Date(order.refundedAt).getTime() <= Date.now();
-    const upcoming = orders.filter(
-        (order) => !sessionHasStarted(order) && !wasRefunded(order),
-    );
-    const past = orders.filter(
-        (order) => sessionHasStarted(order) && !wasRefunded(order),
-    );
+    const bySoonestSession = (a: Order, b: Order) =>
+        sessionStart(a.session.date, a.session.time).getTime() -
+        sessionStart(b.session.date, b.session.time).getTime();
+    const upcoming = orders
+        .filter((order) => !sessionHasStarted(order) && !wasRefunded(order))
+        .sort(bySoonestSession);
+    const past = orders
+        .filter((order) => sessionHasStarted(order) && !wasRefunded(order))
+        .sort(bySoonestSession);
     const visible = when === 'upcoming' ? upcoming : past;
 
     const onRefund = (reference: string) => {
@@ -180,8 +198,10 @@ const TicketCard = ({
     onRefund: () => void;
 }) => {
     const { session } = order;
-    const showHint = order.isUpcoming && !order.isRefundable;
-
+    const tooLateToRefund = lessThanTwoHoursLeft(session.date, session.time);
+    const canRefund = order.isRefundable && !tooLateToRefund;
+    const showHint =
+        order.isUpcoming && !order.isRefundable && !tooLateToRefund;
     return (
         <article className="bg-background-secondary flex items-stretch justify-between rounded-[26px]">
             <div className="flex min-w-0 flex-1 gap-3 p-5">
@@ -261,7 +281,7 @@ const TicketCard = ({
                 <div className="group relative mt-2.5">
                     <button
                         type="button"
-                        disabled={!order.isRefundable || pending}
+                        disabled={!canRefund || pending}
                         onClick={onRefund}
                         className="text-label-m w-full cursor-pointer rounded-full bg-[#FFFFFF1A] px-5.5 py-2.5 font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-40"
                     >
@@ -274,10 +294,16 @@ const TicketCard = ({
                     )}
                 </div>
 
-                {order.isRefundable && (
+                {canRefund && (
                     <p className="text-body-s font-regular text-light-grey-muted mt-3 text-center">
                         Refundable until{' '}
                         {refundUntil(session.date, session.time)}
+                    </p>
+                )}
+                {tooLateToRefund && (
+                    <p className="text-body-s font-regular text-helper-red mt-3 text-center">
+                        Can not be refunded, less than 2 hours left before
+                        session start
                     </p>
                 )}
             </div>

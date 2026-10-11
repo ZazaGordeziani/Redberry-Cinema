@@ -83,18 +83,26 @@ const SessionTicket = ({
                 <p className="text-h3 text-helper-red font-extrabold">
                     ₾ {session.price}
                 </p>
-                <p
-                    className={`text-body-s font-regular flex items-center gap-1 ${
-                        session.seatsLeft <= 5
-                            ? 'text-helper-red'
-                            : 'text-light-grey-muted'
-                    }`}
-                >
-                    <TicketIconSeats
-                        fill={session.seatsLeft <= 5 ? '#EC3013' : '#A9A9A9'}
-                    />{' '}
-                    {session.seatsLeft} left
-                </p>
+                {session.isSoldOut ? (
+                    <p className="text-body-s font-regular text-light-grey-muted">
+                        Sold out
+                    </p>
+                ) : (
+                    <p
+                        className={`text-body-s font-regular flex items-center gap-1 ${
+                            session.seatsLeft <= 5
+                                ? 'text-helper-red'
+                                : 'text-light-grey-muted'
+                        }`}
+                    >
+                        <TicketIconSeats
+                            fill={
+                                session.seatsLeft <= 5 ? '#EC3013' : '#A9A9A9'
+                            }
+                        />{' '}
+                        {session.seatsLeft} left
+                    </p>
+                )}
             </div>
         </div>
     );

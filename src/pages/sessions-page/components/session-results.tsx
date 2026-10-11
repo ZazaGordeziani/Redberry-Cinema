@@ -118,13 +118,19 @@ const SessionCard = ({ session }: { session: CatalogueSession }) => {
                 <p className="text-body-s font-regular text-light-grey-muted">
                     {languageLabel(session.language.name)}
                 </p>
-                <p
-                    className="text-body-s font-regular flex items-center gap-1"
-                    style={{ color: tone }}
-                >
-                    <SeatTicket fill={tone} />
-                    {session.seatsLeft} left
-                </p>
+                {session.isSoldOut ? (
+                    <p className="text-body-s font-regular text-light-grey-muted">
+                        Sold out
+                    </p>
+                ) : (
+                    <p
+                        className="text-body-s font-regular flex items-center gap-1"
+                        style={{ color: tone }}
+                    >
+                        <SeatTicket fill={tone} />
+                        {session.seatsLeft} left
+                    </p>
+                )}
             </div>
 
             <div className="flex items-center justify-between gap-4">
