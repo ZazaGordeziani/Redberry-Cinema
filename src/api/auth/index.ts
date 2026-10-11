@@ -6,7 +6,10 @@ import type { UpdateProfilePayload } from '@/api/auth/index.types';
 
 //login
 export const login = async ({ payload }: LoginPayload) => {
-    const response = await httpClient.post(AUTH_ENDPONTS.LOGIN, payload);
+    const response = await httpClient.post(AUTH_ENDPONTS.LOGIN, {
+        ...payload,
+        email: payload.email.trim().toLowerCase(),
+    });
     return response.data.data;
 };
 
@@ -14,7 +17,7 @@ export const login = async ({ payload }: LoginPayload) => {
 export const register = async (form: RegisterFormValues) => {
     const formData = new FormData();
     formData.append('username', form.username);
-    formData.append('email', form.email);
+    formData.append('email', form.email.trim().toLowerCase());
     formData.append('password', form.password);
     formData.append('password_confirmation', form.confirmPassword);
     if (form.avatar) formData.append('avatar', form.avatar);
