@@ -109,14 +109,14 @@ const CongratulationModal = ({
                     <button
                         type="button"
                         onClick={onTickets}
-                        className="text-label-m bg-helper-red rounded-full px-5.5 py-3.25 font-extrabold text-white"
+                        className="text-label-m bg-helper-red cursor-pointer rounded-full px-5.5 py-3.25 font-extrabold text-white"
                     >
                         View my tickets
                     </button>
                     <button
                         type="button"
                         onClick={onHome}
-                        className="text-label-m rounded-full bg-[#FFFFFF1A] px-5.5 py-3.25 font-extrabold text-white"
+                        className="text-label-m cursor-pointer rounded-full bg-[#FFFFFF1A] px-5.5 py-3.25 font-extrabold text-white"
                     >
                         Back to home
                     </button>

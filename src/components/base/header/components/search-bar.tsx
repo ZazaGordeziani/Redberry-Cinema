@@ -3,7 +3,7 @@ import PopcornIcon from '@/assets/popcorn-icon';
 import SearchIcon from '@/assets/search-icon';
 import SearchIconBig from '@/assets/search-icon-big';
 import { useSearchMovies } from '@/react-query/query';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const highlightTitle = (title: string, query: string) => {
@@ -22,6 +22,12 @@ const highlightTitle = (title: string, query: string) => {
 };
 
 export const SearchBar = () => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const closeMenu = () => {
+        setQuery('');
+        setFocused(false);
+        inputRef.current?.blur();
+    };
     const navigate = useNavigate();
     const [query, setQuery] = useState('');
     const [focused, setFocused] = useState(false);
@@ -35,6 +41,7 @@ export const SearchBar = () => {
         >
             <SearchIcon className="group-focus-within:invisible group-has-[input:not(:placeholder-shown)]:visible" />
             <input
+                ref={inputRef}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onFocus={() => setFocused(true)}
@@ -71,7 +78,10 @@ export const SearchBar = () => {
                         </div>
                         <button
                             type="button"
-                            onClick={() => navigate('/sessions')}
+                            onClick={() => {
+                                closeMenu();
+                                navigate('/sessions');
+                            }}
                             className="text-label-m cursor-pointer rounded-[999px] bg-[#FFFFFF1A] px-5.5 py-3.25 font-extrabold text-white"
                         >
                             Browse all sessions
@@ -99,9 +109,10 @@ export const SearchBar = () => {
                             <button
                                 key={movie.id}
                                 type="button"
-                                onClick={() =>
-                                    navigate(`/movies/${movie.slug}`)
-                                }
+                                onClick={() => {
+                                    closeMenu();
+                                    navigate(`/movies/${movie.slug}`);
+                                }}
                                 className="flex h-18 w-full items-center rounded-[10px] py-2 pr-5 pl-5 hover:cursor-pointer hover:bg-[#FFFFFF1A]"
                             >
                                 <img

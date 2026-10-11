@@ -22,6 +22,7 @@ import type { CheckoutDraft } from '@/components/booking/checkout-form';
 import CongratulationModal from '@/components/booking/congratulation-modal';
 import { createOrder } from '@/api/order';
 import type { Order } from '@/api/order/index.types';
+import { BounceLoader } from 'react-spinners';
 type HoldError = { message?: string; contested?: string[] };
 type OrderError = {
     message?: string;
@@ -113,22 +114,25 @@ const BookingModal = () => {
             { replace: true, state: null },
         );
     };
-    const chooseStep = (nextStep: 'seats' | 'checkout') => {
-        const next = qs.parse(location.search, { ignoreQueryPrefix: true });
-        if (nextStep === 'checkout') next.step = 'checkout';
-        else delete next.step;
-        setStep(nextStep);
-        navigate(
-            {
-                pathname: location.pathname,
-                search: qs.stringify(next, {
-                    arrayFormat: 'repeat',
-                    skipNulls: true,
-                }),
-            },
-            { state: location.state },
-        );
-    };
+    const chooseStep = useCallback(
+        (nextStep: 'seats' | 'checkout') => {
+            const next = qs.parse(location.search, { ignoreQueryPrefix: true });
+            if (nextStep === 'checkout') next.step = 'checkout';
+            else delete next.step;
+            setStep(nextStep);
+            navigate(
+                {
+                    pathname: location.pathname,
+                    search: qs.stringify(next, {
+                        arrayFormat: 'repeat',
+                        skipNulls: true,
+                    }),
+                },
+                { state: location.state },
+            );
+        },
+        [location.pathname, location.search, location.state, navigate],
+    );
 
     useEffect(() => {
         setSelected([]);
@@ -257,7 +261,7 @@ const BookingModal = () => {
         chooseStep('seats');
         setDialog('Your hold time expired. Please re-select your seats.');
         refetch();
-    }, [remaining, deadline, refetch]);
+    }, [remaining, deadline, refetch, chooseStep]);
 
     const priceOf = (seat: SelectedSeat) => {
         const held = priced[seat.seatId];
@@ -403,6 +407,16 @@ const BookingModal = () => {
 
     if (!me.profileComplete) {
         return <CompleteProfileModal onClose={close} />;
+    }
+    if (step === 'seats' && (isMapLoading || !map)) {
+        return (
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-[#2424244D] backdrop-blur-xs"
+                onClick={close}
+            >
+                <BounceLoader color="#EC3013" size={84} speedMultiplier={0.6} />
+            </div>
+        );
     }
 
     const meta = summary
