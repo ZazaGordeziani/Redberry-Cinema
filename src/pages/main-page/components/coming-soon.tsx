@@ -69,7 +69,7 @@ const ComingSoon = () => {
                             key={movie.id}
                             onClick={() => navigate(`/movies/${movie.slug}`)}
 
-                            className="bg-background-secondary flex h-43 w-117.5 shrink-0 flex-row gap-3.75 rounded-[20px] p-3 shadow-[0_1px_4px_0_#00000033]"
+                            className="bg-background-secondary flex h-43 w-117.5 shrink-0 cursor-pointer flex-row gap-3.75 rounded-[20px] p-3 shadow-[0_1px_4px_0_#00000033]"
                         >
                             <img
                                 src={movie.posterUrl}

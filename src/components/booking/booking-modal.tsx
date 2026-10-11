@@ -262,7 +262,16 @@ const BookingModal = () => {
         setDialog('Your hold time expired. Please re-select your seats.');
         refetch();
     }, [remaining, deadline, refetch, chooseStep]);
-
+    useEffect(() => {
+        if (!order) return;
+        const here = window.location.href;
+        window.history.pushState({ congrats: true }, '', here);
+        const stay = () => {
+            window.history.pushState({ congrats: true }, '', here);
+        };
+        window.addEventListener('popstate', stay);
+        return () => window.removeEventListener('popstate', stay);
+    }, [order]);
     const priceOf = (seat: SelectedSeat) => {
         const held = priced[seat.seatId];
         if (held?.type === seat.ticketType) return held.price;
